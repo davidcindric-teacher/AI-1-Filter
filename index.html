@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Laboration i AI nivå 1: träna och undersök ett enkelt spamfilter direkt i webbläsaren." />
+    <title>Träna och undersök ett spamfilter</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b6b45'/%3E%3Cpath d='M8 17l5 5 11-12' fill='none' stroke='white' stroke-width='3.5'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Hoppa till innehållet</a>
+    <div class="topbar">
+      <div class="wrap topbar-inner">
+        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-controls="menu-drawer">
+          <span class="burger" aria-hidden="true"></span>
+          <span>Meny</span>
+        </button>
+        <div class="view-row">
+          <span id="view-label" class="view-label">Visning:</span>
+          <div id="view-toggle" class="view-toggle" role="group" aria-labelledby="view-label"></div>
+        </div>
+        <p class="credit credit-top">Skapad av David Cindric<br />Amerikanska Gymnasiet</p>
+      </div>
+      <div class="wrap"><div id="error-region" role="alert" aria-live="assertive"></div></div>
+    </div>
+
+    <div id="menu-backdrop" class="backdrop" hidden></div>
+    <nav id="menu-drawer" class="drawer" aria-label="Avsnitt" hidden>
+      <div class="drawer-head">
+        <p class="drawer-title">Innehåll</p>
+        <button type="button" id="menu-close" class="btn btn-small btn-secondary">Stäng</button>
+      </div>
+      <div class="drawer-block">
+        <p class="drawer-sub">Lektion</p>
+        <div id="lesson-picker-drawer" class="lesson-picker lesson-picker-small"></div>
+      </div>
+      <div class="drawer-block" id="guide-drawer-block">
+        <p class="drawer-sub">Din lektionsguide</p>
+        <div id="guide-drawer"></div>
+      </div>
+      <p class="drawer-sub">Avsnitt</p>
+      <ol class="drawer-list">
+        <li data-lessons="1 2 3 4 5"><a href="#intro">Introduktion</a></li>
+        <li data-lessons="1 2 3 4"><a href="#forbered">Förbered och träna</a></li>
+        <li data-lessons="1 2 3 4 5"><a href="#resultat">Resultat</a></li>
+        <li data-lessons="1 2 3 4"><a href="#testa">Testa egen text</a></li>
+        <li data-lessons="4"><a href="#egen-data">Egen data och sluttest</a></li>
+        <li data-lessons="1 2 3 4 5" class="only-standard"><a href="#extra">Extra: fördjupning</a></li>
+        <li data-lessons="1 2 3 4 5"><a href="#spara">Spara och återställ</a></li>
+      </ol>
+    </nav>
+
+    <header class="site-header">
+      <div class="wrap">
+        <p class="eyebrow">Laboration i AI, nivå 1</p>
+        <h1>Träna och undersök ett spamfilter</h1>
+        <p class="save-banner" role="note">
+          <strong>Arbetsdokumentet är den riktiga sparplatsen.</strong> Kopiera resultat och återställningstext efter varje körning.
+        </p>
+        <div class="lesson-block">
+          <p id="lesson-label" class="lesson-label">Vilken lektion arbetar du med?</p>
+          <div id="lesson-picker" class="lesson-picker" role="group" aria-labelledby="lesson-label"></div>
+          <p id="lesson-goal" class="lesson-goal" aria-live="polite"></p>
+        </div>
+        <details id="guide-page-block" class="guide-block">
+          <summary class="guide-summary"><span class="guide-title">Din lektionsguide</span><span id="guide-summary-text" class="guide-next"></span></summary>
+          <div id="guide-page"></div>
+        </details>
+        <p class="credit credit-header">Skapad av David Cindric, Amerikanska Gymnasiet</p>
+      </div>
+    </header>
+
+    <main id="main" class="wrap" tabindex="-1">
+      <noscript><p class="banner banner-error">Appen kräver JavaScript. Aktivera JavaScript i webbläsaren och ladda om sidan.</p></noscript>
+
+      <section id="intro" data-lessons="1 2 3 4 5" aria-labelledby="h-intro">
+        <h2 id="h-intro">Introduktion</h2>
+        <p class="intro-teaser">
+          Du tränar en liten modell som avgör om ett svenskt textmeddelande är <strong>spam</strong> eller ett <strong>vanligt meddelande</strong>.
+        </p>
+        <details id="intro-details" class="intro-details" open>
+          <summary>Visa eller dölj introduktionen</summary>
+        <p>
+          Sedan undersöker du hur modellen beter sig och varför: vad den lär sig, vilka fel den gör och varför den ibland har fel.
+          Allt körs i din webbläsare. Ingenting skickas någonstans och ingen inloggning behövs.
+        </p>
+        <dl class="defs">
+          <div>
+            <dt>Träningsdata</dt>
+            <dd>Texter med facit (spam eller vanligt). Modellen lär sig av dem genom att vikterna ändras lite efter varje epok.</dd>
+          </div>
+          <div>
+            <dt>Valideringsdata</dt>
+            <dd>20 fasta texter som modellen inte tränar på. De används för att följa hur bra modellen är på texter den inte sett. De kan inte ändras.</dd>
+          </div>
+          <div>
+            <dt>Sluttestet</dt>
+            <dd>20 låsta texter som används en enda gång, efter din förbättring. Du får <strong>inte</strong> använda sluttestet för att justera modellen efteråt.</dd>
+          </div>
+        </dl>
+        <p class="muted only-standard">
+          Modellen förstår inte text som en människa. Den räknar med vilka ord som finns, och resultaten är osäkra eftersom underlaget är litet.
+        </p>
+        </details>
+      </section>
+
+      <section id="forbered" data-lessons="1 2 3 4" aria-labelledby="h-prep">
+        <h2 id="h-prep">Förbered och träna</h2>
+        <div id="data" class="step-block">
+          <h3>Steg 1: Välj dataset</h3>
+          <div id="mount-data"></div>
+        </div>
+        <div id="installningar" class="step-block">
+          <h3>Steg 2: Välj inställningar</h3>
+          <div id="mount-settings"></div>
+        </div>
+        <div id="trana" class="step-block">
+          <h3>Steg 3: Träna modellen</h3>
+          <div id="mount-train"></div>
+        </div>
+      </section>
+
+      <section id="resultat" data-lessons="1 2 3 4 5" aria-labelledby="h-results">
+        <h2 id="h-results">Resultat</h2>
+        <div id="mount-results"></div>
+      </section>
+
+      <section id="testa" data-lessons="1 2 3 4" aria-labelledby="h-test">
+        <h2 id="h-test">Testa egen text</h2>
+        <div id="mount-tester"></div>
+      </section>
+
+      <section id="egen-data" data-lessons="4" aria-labelledby="h-custom">
+        <h2 id="h-custom">Skapa egen förbättrad data och kör sluttest</h2>
+        <div id="mount-editor"></div>
+        <div id="mount-final"></div>
+      </section>
+
+      <section id="extra" class="only-standard" data-lessons="1 2 3 4 5" aria-labelledby="h-extra">
+        <h2 id="h-extra">Extra: fördjupning</h2>
+        <div id="mount-extra"></div>
+      </section>
+
+      <section id="spara" data-lessons="1 2 3 4 5" aria-labelledby="h-save">
+        <h2 id="h-save">Spara och återställ</h2>
+        <div id="mount-save"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          Träna och undersök ett spamfilter · appversion <span id="app-version"></span> · Alla texter är påhittade. Ingen data lämnar din enhet.
+        </p>
+      </div>
+    </footer>
+    <div id="status-region" class="offscreen" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
