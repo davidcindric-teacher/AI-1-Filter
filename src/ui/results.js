@@ -176,7 +176,7 @@ function epochTable(run) {
  * Egna texter testas i nästa steg (Testa egen text), inte i kortet.
  * I lektion 3 visas tolkningstipsen om under- och överanpassning direkt eftersom de är lektionens fokus.
  */
-function runArticle(run, index, lesson, store) {
+function runArticle(run, index, lesson) {
   const s = run.settings;
   const headingId = `run-h-${run.id}`;
   const notes = h('div', { class: 'notes' }, h('h4', { text: 'Möjliga tecken att undersöka' }), h('ul', {}, interpretationNotes(run).map((t) => h('li', { text: t }))));
@@ -266,9 +266,9 @@ function historyBox(history, onClear) {
  * så här väljer eleven i stället en körning i taget med flikknappar. Jämförelsetabellen ovanför visar
  * ändå alla körningar samtidigt, så inget mått försvinner – bara de tunga korten (diagram, felanalys, snabbtest).
  */
-function runsView(runs, lesson, store, tabState) {
+function runsView(runs, lesson, tabState) {
   if (runs.length < 3) {
-    return h('div', { class: `run-grid runs-${runs.length}` }, runs.map((r, i) => runArticle(r, i, lesson, store)));
+    return h('div', { class: `run-grid runs-${runs.length}` }, runs.map((r, i) => runArticle(r, i, lesson)));
   }
   if (tabState.index >= runs.length) tabState.index = 0;
   const panel = h('div', { class: 'run-tab-panel' });
@@ -284,7 +284,7 @@ function runsView(runs, lesson, store, tabState) {
   function select(i) {
     tabState.index = i;
     buttons.forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
-    replace(panel, runArticle(runs[i], i, lesson, store));
+    replace(panel, runArticle(runs[i], i, lesson));
   }
   select(tabState.index);
   return h(
@@ -369,7 +369,7 @@ export function mountResults(root, store, { onCopy }) {
         state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: retrain, text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection(retrain); } }),
       ),
       runs.length > 1 ? comparison(runs, state.runsMode) : null,
-      runsView(runs, state.lesson, store, tabState),
+      runsView(runs, state.lesson, tabState),
       // Historiken (hopfälld, sist) visas först när det finns äldre körningar utöver de som redan syns ovan.
       state.history.length > runs.length ? historyBox(state.history, () => store.set({ history: [] })) : null,
       h('p', { class: 'muted only-standard', text: `Modellbeskrivning: ${architectureText(runs[0])}` }),
