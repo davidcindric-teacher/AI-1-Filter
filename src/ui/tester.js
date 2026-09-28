@@ -6,7 +6,7 @@ import { h, replace, table } from './dom.js';
 export const runDisplayName = (run) => `${run.label} · ${run.settings.epochs} epoker · frö ${run.settings.seed}`;
 
 /**
- * Testar en text på en modell och loggar den i testLog (delas av huvudtestet och snabbtestet i resultatkorten).
+ * Testar en text på en modell och loggar den i testLog.
  * Kastar UserError vid tom text (samma fel som testText). Ändrar aldrig modellen eller träningsdata.
  */
 export function testAndLog(store, run, text) {
@@ -21,7 +21,7 @@ export function mountTester(root, store) {
   const output = h('div', { class: 'tester-output', role: 'status', 'aria-live': 'polite' });
   const logBox = h('div');
   const counter = h('p', { class: 'test-counter', 'aria-live': 'polite' });
-  const noRuns = h('p', { class: 'muted', hidden: true, text: 'Träna en modell först (avsnittet Förbered och träna). Sedan kan du testa egna texter här.' });
+  const noRuns = h('p', { class: 'muted', hidden: true, text: 'Träna en modell först (steget Träna modellen). Sedan kan du testa egna texter här.' });
 
   const run = () => {
     const state = store.get();
@@ -45,8 +45,7 @@ export function mountTester(root, store) {
           answer.tokens.length ? answer.tokens.map((t, i) => [h('span', { class: `token ${t.known ? 'known' : 'unknown'}`, text: t.word }), i < answer.tokens.length - 1 ? ' ' : '']) : 'inga ord',
           h('span', { class: 'muted', text: ` (${answer.knownCount} av ${new Set(answer.tokens.map((t) => t.word)).size} olika ord kändes igen)` }),
         ),
-        h('p', { class: 'muted', text: 'Din text har inte lagts till i träningsdata och har inte ändrat modellen.' }),
-      );
+              );
       // Ingen egen announce() här: output har redan role="status" aria-live="polite", så innehållet
       // läses upp automatiskt när det byts ut. Ett extra announce()-anrop skulle läsa upp det två gånger.
     } catch (err) {

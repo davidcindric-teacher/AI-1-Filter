@@ -87,10 +87,10 @@ function runSection(run, index) {
     ...metricLines(run.validation.metrics),
     ...errorLines(run.validation.rows, 'Felklassificerade texter i valideringsdata'),
     '',
-    `Träffsäkerhet på träningsdata: ${formatMetric(run.train.metrics.accuracy)} (training accuracy)`,
-    `Träffsäkerhet på valideringsdata: ${formatMetric(run.validation.metrics.accuracy)} (validation accuracy)`,
+    `Training accuracy: ${formatMetric(run.train.metrics.accuracy)}`,
+    `Validation accuracy: ${formatMetric(run.validation.metrics.accuracy)}`,
     '',
-    'Kurvvärden (urval av epoker): epok | training accuracy | validation accuracy | träningsförlust | valideringsförlust',
+    'Kurvvärden (urval av epoker): epok | training accuracy | validation accuracy | training loss | validation loss',
     ...epochs.map((e) => {
       const h = run.history[e - 1];
       return `  ${e} | ${formatMetric(h.trainAccuracy)} | ${formatMetric(h.valAccuracy)} | ${formatNumber(h.trainLoss)} | ${formatNumber(h.valLoss)}`;
@@ -173,7 +173,7 @@ export function buildResultBlock({ attemptName, now = new Date(), runs, testLog 
 
   if (finalTest) {
     lines.push(
-      `SLUTTEST (20 låsta texter, 10 spam och 10 vanliga). Sluttestet har körts ${finalTest.count} gång(er).`,
+      `SLUTTEST (20 texter, 10 spam och 10 vanliga). Sluttestet har körts ${finalTest.count} gång(er).`,
       'Sluttestet får inte användas för att justera modellen efteråt.',
     );
     for (const { runLabel, evaluation } of finalTest.entries) {

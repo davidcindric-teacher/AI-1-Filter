@@ -33,7 +33,7 @@ export function mountMix(root, store) {
     );
 
   root.append(
-    h('h4', { text: 'Dataset C: välj egna träningstexter' }),
+    h('h3', { text: 'Dataset C: välj egna träningstexter' }),
     h('p', {}, `Plocka själv ${CLASS_SIZE} spamtexter och ${CLASS_SIZE} vanliga texter ur dataset A och B (A och B har 40 texter var). Du får då ett eget dataset C. Vad händer när du själv bestämmer träningsdatan? Validerings- och sluttestdata finns aldrig bland valen.`),
     status,
     h(

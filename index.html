@@ -38,34 +38,23 @@
         <p class="drawer-sub">Din lektionsguide</p>
         <div id="guide-drawer"></div>
       </div>
-      <p class="drawer-sub">Avsnitt</p>
-      <ol class="drawer-list">
-        <li data-lessons="1 2 3 4 5"><a href="#intro">Introduktion</a></li>
-        <li data-lessons="1 2 3 4"><a href="#forbered">Förbered och träna</a></li>
-        <li data-lessons="1 2 3 4 5"><a href="#resultat">Resultat</a></li>
-        <li data-lessons="1 2 3 4"><a href="#testa">Testa egen text</a></li>
-        <li data-lessons="4"><a href="#egen-data">Egen data och sluttest</a></li>
-        <li data-lessons="1 2 3 4 5" class="only-standard"><a href="#extra">Extra: fördjupning</a></li>
-        <li data-lessons="1 2 3 4 5"><a href="#spara">Spara och återställ</a></li>
-      </ol>
     </nav>
 
     <header class="site-header">
       <div class="wrap">
         <p class="eyebrow">Laboration i AI, nivå 1</p>
         <h1>Träna och undersök ett spamfilter</h1>
-        <p class="save-banner" role="note">
-          <strong>Arbetsdokumentet är den riktiga sparplatsen.</strong> Kopiera resultat och återställningstext efter varje körning.
-        </p>
-        <div class="lesson-block">
-          <p id="lesson-label" class="lesson-label">Vilken lektion arbetar du med?</p>
-          <div id="lesson-picker" class="lesson-picker" role="group" aria-labelledby="lesson-label"></div>
-          <p id="lesson-goal" class="lesson-goal" aria-live="polite"></p>
+        <div id="home" class="home">
+          <h2 id="home-heading" class="lesson-label" tabindex="-1">Vilken lektion arbetar du med?</h2>
+          <div id="lesson-cards"></div>
         </div>
-        <details id="guide-page-block" class="guide-block">
-          <summary class="guide-summary"><span class="guide-title">Din lektionsguide</span><span id="guide-summary-text" class="guide-next"></span></summary>
-          <div id="guide-page"></div>
-        </details>
+        <div class="lesson-head">
+          <div>
+            <h2 id="lesson-heading" class="lesson-heading" tabindex="-1"></h2>
+            <p id="lesson-goal" class="lesson-goal"></p>
+          </div>
+          <button type="button" id="btn-home" class="btn btn-small btn-secondary">← Byt lektion</button>
+        </div>
         <p class="credit credit-header">Skapad av David Cindric, Amerikanska Gymnasiet</p>
       </div>
     </header>
@@ -75,47 +64,80 @@
 
       <section id="intro" data-lessons="1 2 3 4 5" aria-labelledby="h-intro">
         <h2 id="h-intro">Introduktion</h2>
-        <p class="intro-teaser">
-          Du tränar en liten modell som avgör om ett svenskt textmeddelande är <strong>spam</strong> eller ett <strong>vanligt meddelande</strong>.
+        <!-- Introtext per lektion först, sedan begreppen (öppna i lektion 1, hopfällda sedan), sist spara-påminnelse och guide. -->
+        <div data-lessons="1">
+          <p class="intro-teaser">
+            Du tränar en liten modell som avgör om ett svenskt textmeddelande är <strong>spam</strong> eller ett <strong>vanligt meddelande</strong>.
+          </p>
+          <p>
+            Sedan undersöker du hur modellen beter sig och varför: vad den lär sig, vilka fel den gör och varför den ibland har fel.
+            Allt körs i din webbläsare. Ingenting skickas någonstans och ingen inloggning behövs.
+          </p>
+        </div>
+        <p class="intro-teaser" data-lessons="2">
+          I lektion 1 tränade du en modell på dataset A. Nu tränar du två modeller med <strong>exakt samma inställningar</strong>, en på dataset A och en på dataset B.
+          Det enda som skiljer är träningsdatan. Hur mycket påverkar den vad modellen lär sig och vilka fel den gör?
         </p>
-        <details id="intro-details" class="intro-details" open>
-          <summary>Visa eller dölj introduktionen</summary>
-        <p>
-          Sedan undersöker du hur modellen beter sig och varför: vad den lär sig, vilka fel den gör och varför den ibland har fel.
-          Allt körs i din webbläsare. Ingenting skickas någonstans och ingen inloggning behövs.
+        <p class="intro-teaser" data-lessons="3">
+          Nu undersöker du <strong>hur länge modellen tränar</strong>. Dataset B tränas tre gånger: 5, 30 och 100 epoker.
+          Jämför kurvorna för training accuracy och validation accuracy: lär sig modellen för lite (underanpassning), eller lär den sig träningstexterna utantill (överanpassning)?
         </p>
-        <dl class="defs">
-          <div>
-            <dt>Träningsdata</dt>
-            <dd>Texter med facit (spam eller vanligt). Modellen lär sig av dem genom att vikterna ändras lite efter varje epok.</dd>
-          </div>
-          <div>
-            <dt>Valideringsdata</dt>
-            <dd>20 fasta texter som modellen inte tränar på. De används för att följa hur bra modellen är på texter den inte sett. De kan inte ändras.</dd>
-          </div>
-          <div>
-            <dt>Sluttestet</dt>
-            <dd>20 låsta texter som används en enda gång, efter din förbättring. Du får <strong>inte</strong> använda sluttestet för att justera modellen efteråt.</dd>
-          </div>
-        </dl>
-        <p class="muted only-standard">
-          Modellen förstår inte text som en människa. Den räknar med vilka ord som finns, och resultaten är osäkra eftersom underlaget är litet.
+        <p class="intro-teaser" data-lessons="4">
+          Nu försöker du <strong>förbättra modellen genom att förbättra träningsdatan</strong>. Du byter ut 5 spamtexter och 5 vanliga texter i dataset B, tränar före och efter och jämför.
+          Till sist kör du sluttestet en enda gång, för att se om förbättringen håller på texter som ingen har använt tidigare.
         </p>
+        <div data-lessons="5">
+          <p class="intro-teaser">
+            I den här lektionen tränar du inga nya modeller. Du <strong>analyserar dina egna resultat</strong> från lektion 1–4 i ditt arbetsdokument.
+          </p>
+          <ol class="steps">
+            <li>Läs in din återställningstext från en tidigare lektion i steget <strong>Resultat</strong>, så att siffrorna finns i appen igen.</li>
+            <li>Kopiera analysmallen i steget <strong>Fördjupning</strong>. Den har rubriker och stödfrågor med dina siffror ifyllda.</li>
+            <li>Skriv analysen själv. Varje påstående ska stödjas av dina egna siffror.</li>
+            <li>Byt analys med en kamrat och granska den med checklistan.</li>
+          </ol>
+        </div>
+        <details id="intro-details" class="intro-details" data-lessons="1 2 3 4" open>
+          <summary>Begrepp: träningsdata, valideringsdata och sluttest</summary>
+          <dl class="defs">
+            <div>
+              <dt>Träningsdata</dt>
+              <dd>Texter med facit (spam eller vanligt). Modellen lär sig av dem genom att vikterna ändras lite efter varje epok.</dd>
+            </div>
+            <div>
+              <dt>Valideringsdata</dt>
+              <dd>20 fasta texter som modellen inte tränar på. De används för att följa hur bra modellen är på texter den inte sett. De kan inte ändras.</dd>
+            </div>
+            <div>
+              <dt>Sluttestet</dt>
+              <dd>20 texter som bara används en gång, som ett sista test efter din förbättring. Du får <strong>inte</strong> använda sluttestet för att justera modellen efteråt.</dd>
+            </div>
+          </dl>
+          <p class="muted only-standard">
+            Modellen förstår inte text som en människa. Den räknar med vilka ord som finns, och resultaten är osäkra eftersom underlaget är litet.
+          </p>
         </details>
+        <p class="save-banner" role="note">
+          <strong>Arbetsdokumentet är den riktiga sparplatsen.</strong> Kopiera resultat och återställningstext efter varje körning.
+        </p>
+        <div id="guide-page-block" class="guide-block">
+          <h3 class="guide-title">Din lektionsguide</h3>
+          <div id="guide-page"></div>
+        </div>
       </section>
 
       <section id="forbered" data-lessons="1 2 3 4" aria-labelledby="h-prep">
         <h2 id="h-prep">Förbered och träna</h2>
         <div id="data" class="step-block">
-          <h3>Steg 1: Välj dataset</h3>
+          <h3>Välj dataset</h3>
           <div id="mount-data"></div>
         </div>
         <div id="installningar" class="step-block">
-          <h3>Steg 2: Välj inställningar</h3>
+          <h3>Välj inställningar</h3>
           <div id="mount-settings"></div>
         </div>
         <div id="trana" class="step-block">
-          <h3>Steg 3: Träna modellen</h3>
+          <h3>Träna modellen</h3>
           <div id="mount-train"></div>
         </div>
       </section>
@@ -131,13 +153,23 @@
       </section>
 
       <section id="egen-data" data-lessons="4" aria-labelledby="h-custom">
-        <h2 id="h-custom">Skapa egen förbättrad data och kör sluttest</h2>
-        <div id="mount-editor"></div>
-        <div id="mount-final"></div>
+        <h2 id="h-custom">Förbättra data och kör sluttest</h2>
+        <div id="byt-texter" class="step-block">
+          <h3>Byt ut texter</h3>
+          <div id="mount-editor"></div>
+        </div>
+        <div id="fore-efter" class="step-block">
+          <h3>Träna före och efter</h3>
+          <div id="mount-improve-train"></div>
+        </div>
+        <div id="sluttest" class="step-block">
+          <h3>Sluttest</h3>
+          <div id="mount-final"></div>
+        </div>
       </section>
 
       <section id="extra" class="only-standard" data-lessons="1 2 3 4 5" aria-labelledby="h-extra">
-        <h2 id="h-extra">Extra: fördjupning</h2>
+        <h2 id="h-extra">Fördjupning</h2>
         <div id="mount-extra"></div>
       </section>
 

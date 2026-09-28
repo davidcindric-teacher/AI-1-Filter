@@ -3,6 +3,7 @@ import { trainModel } from '../ml/trainer.js';
 import { TrainingCancelled, UserError } from '../errors.js';
 import { appendHistory } from '../history.js';
 import { announce, h } from './dom.js';
+import { goToSection } from './nav.js';
 
 let runCounter = 0;
 let cancelRequested = false;
@@ -87,9 +88,10 @@ export async function startTraining(store) {
       copied: { ...store.get().copied, result: false, recovery: false },
       finalTest: null,
       thresholdExp: null,
-      notice: { text: 'Träningen är klar. Resultaten visas i avsnittet Resultat. Kopiera resultatblock och återställningstext till ditt arbetsdokument (avsnittet Spara och återställ).' },
+      notice: { text: 'Träningen är klar. Resultaten visas i steget Resultat. Kopiera resultatblock och återställningstext till ditt arbetsdokument (steget Spara och återställ).' },
     });
-    document.getElementById('resultat')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Går vidare till steget Resultat (i steg-för-steg-visningen byts steg, annars rullar sidan dit).
+    goToSection('#resultat');
   });
 }
 
@@ -108,7 +110,7 @@ export async function startSeedExperiment(store) {
     store.set({
       training: null,
       seedExperiment: { runs: results },
-      notice: { text: 'Frö-experimentet är klart. Se resultaten i avsnittet Extra. Dina vanliga resultat i avsnittet Resultat är oförändrade.' },
+      notice: { text: 'Frö-experimentet är klart. Se resultaten i steget Fördjupning. Dina vanliga resultat i steget Resultat är oförändrade.' },
     });
     document.getElementById('extra')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
@@ -131,7 +133,7 @@ export async function startSeedImprove(store) {
     store.set({
       training: null,
       seedImprove: { pairs },
-      notice: { text: 'Före/efter över flera frön är klart. Se resultaten i avsnittet Extra. Dina vanliga resultat i avsnittet Resultat är oförändrade.' },
+      notice: { text: 'Före/efter över flera frön är klart. Se resultaten i steget Fördjupning. Dina vanliga resultat i steget Resultat är oförändrade.' },
     });
     document.getElementById('extra')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
@@ -156,7 +158,12 @@ export function mountTrain(root, store) {
   const status = h('p', { id: 'train-status', class: 'train-status' });
   const notice = h('p', { class: 'banner banner-ok', hidden: true });
 
+  // Lektion 1: eleven skriver en hypotes innan träningen, så att resultatet kan jämföras med förväntan.
+  const hypothesis = h('p', { class: 'callout' }, h('strong', { text: 'Innan du tränar: ' }), 'skriv i ditt dokument vad du tror att validation accuracy blir. Jämför sedan med resultatet och försök förklara skillnaden.');
+  hypothesis.dataset.lessons = '1';
+
   root.append(
+    hypothesis,
     h('p', {}, 'Varje träning börjar ', h('strong', { text: 'från början' }), ' med nya startvikter som bestäms av slumpfröet. Modellen fortsätter aldrig från en tidigare träning, så samma inställningar ger alltid samma resultat.'),
     h('div', { class: 'button-row' }, startBtn, cancelBtn),
     plan,

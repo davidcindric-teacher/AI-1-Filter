@@ -3,6 +3,7 @@ import { evaluateOnTexts } from '../ml/trainer.js';
 import { formatMetric } from '../metrics.js';
 import { confusionTable, misclassifiedTable } from './results.js';
 import { announce, h, replace, table } from './dom.js';
+import { codeGate } from './teacherCode.js';
 
 export function mountFinalTest(root, store) {
   const body = h('div');
@@ -11,34 +12,40 @@ export function mountFinalTest(root, store) {
   const runFinal = () => {
     const state = store.get();
     const entries = state.runs.map((run) => ({ runLabel: run.label, evaluation: evaluateOnTexts(run, FINAL_TEST_TEXTS) }));
-    store.set({ finalTest: { count: state.finalTestRuns + 1, entries }, finalTestRuns: state.finalTestRuns + 1 });
+    // Låses igen direkt: varje körning av sluttestet kräver lärarkoden.
+    store.set({ finalTest: { count: state.finalTestRuns + 1, entries }, finalTestRuns: state.finalTestRuns + 1, finalTestUnlocked: false });
     announce('Sluttestet är kört.');
   };
 
   let last = null;
   const render = (state) => {
-    const sig = [state.runs, state.runsMode, state.finalTest, state.finalTestRuns];
+    const sig = [state.runs, state.runsMode, state.finalTest, state.finalTestRuns, state.finalTestUnlocked];
     if (last && sig.every((v, i) => v === last[i])) return;
     last = sig;
     const ready = state.runsMode === 'improve' && state.runs.length === 2;
     const warning = h(
       'div',
       { class: 'callout callout-strong' },
-      h('p', {}, h('strong', { text: 'Sluttestet är låst och får inte användas för att justera modellen. ' }), 'Kör det när du är färdig med din förbättring. Ändrar du modellen eller träningsdatan efter att du sett resultatet är sluttestet inte längre ett oberoende test.'),
+      h('p', {}, h('strong', { text: 'Sluttestet är ett engångstest och får inte användas för att justera modellen. ' }), 'Kör det när du är färdig med din förbättring. Ändrar du modellen eller träningsdatan efter att du sett resultatet är sluttestet inte längre ett oberoende test.'),
     );
     const intro = h('p', { class: 'only-standard' }, `Sluttestet består av ${FINAL_TEST_TEXTS.length} texter (10 spam, 10 vanliga) som är skilda från både träningsdata och valideringsdata. Texterna kan inte redigeras och visas inte som träningsmaterial. Om modellen svarar fel visas just de texterna i resultatet.`);
     if (!ready) {
-      replace(body, h('h3', { text: 'Sluttest' }), intro, warning, h('p', { class: 'muted', text: 'Träna först "före och efter" med knappen ovan (Lektion 4). Sedan kan du köra sluttestet här.' }), state.finalTestRuns ? h('p', { class: 'muted', text: `Sluttestet har körts ${state.finalTestRuns} gång(er) under den här sessionen.` }) : null);
+      replace(body, intro, warning, h('p', { class: 'muted' }, 'Träna först i steget ', h('a', { href: '#fore-efter', text: 'Träna före och efter' }), '. Sedan kan du köra sluttestet här.'), state.finalTestRuns ? h('p', { class: 'muted', text: `Sluttestet har körts ${state.finalTestRuns} gång(er) under den här sessionen.` }) : null);
       return;
     }
     const [before, after] = state.runs;
     const ft = state.finalTest;
-    const parts = [
-      h('h3', { text: 'Sluttest' }),
-      intro,
-      warning,
-      h('div', { class: 'button-row' }, h('button', { type: 'button', class: 'btn btn-primary', text: ft ? 'Kör sluttestet igen' : 'Kör sluttestet', onclick: runFinal })),
-    ];
+    const runBtn = h('button', { type: 'button', class: 'btn btn-primary', id: 'btn-final', text: ft ? 'Kör sluttestet igen' : 'Kör sluttestet', onclick: runFinal });
+    const gate = codeGate({
+      id: 'code-final',
+      title: ft ? 'Sluttestet är redan kört. Läraren måste låsa upp det igen.' : 'Sluttestet låses upp av läraren.',
+      hint: 'Visa läraren din jämförelse före och efter. Läraren skriver sedan in lärarkoden.',
+      onUnlock: () => {
+        store.set({ finalTestUnlocked: true });
+        document.getElementById('btn-final')?.focus();
+      },
+    });
+    const parts = [intro, warning, state.finalTestUnlocked ? h('div', { class: 'button-row' }, runBtn) : gate.el];
     if (state.finalTestRuns > 1) {
       parts.push(h('p', { class: 'banner banner-warn', text: `Sluttestet har körts ${state.finalTestRuns} gånger. Om du har ändrat något efter att du såg ett tidigare resultat är sluttestet inte längre oberoende. Redovisa det i så fall.` }));
     }
@@ -60,7 +67,7 @@ export function mountFinalTest(root, store) {
             ['Falskt negativa', String(before.validation.metrics.fn), String(after.validation.metrics.fn), String(fb.metrics.fn), String(fa.metrics.fn)],
           ],
         }),
-        h('p', { class: 'muted', text: 'Med bara 20 texter i varje mängd kan små skillnader bero på slumpen. Bra resultat på valideringsdata garanterar inte samma resultat på sluttestet eller på nya texter.' }),
+        h('p', { class: 'muted', text: 'Bra resultat på valideringsdata garanterar inte samma resultat på sluttestet eller på nya texter.' }),
         h('div', { class: 'run-grid runs-2' }, [
           [`Före: ${before.label}`, fb],
           [`Efter: ${after.label}`, fa],

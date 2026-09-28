@@ -6,7 +6,7 @@ import { analyzeErrors, bestEpochIndex } from '../analysis.js';
 import { legend, lineChart } from './charts.js';
 import { explained, h, replace, table } from './dom.js';
 import { goToSection } from './nav.js';
-import { quickTest } from './quickTest.js';
+import { mountRestore } from './save.js';
 
 const pct = (v) => formatMetric(v);
 
@@ -43,16 +43,21 @@ function metricsTable(run) {
     rowHeaders: true,
     className: 'plain',
     rows: [
-      [explained('Accuracy (träffsäkerhet på valideringsdata)', EXPLAIN.accuracy), pct(m.accuracy)],
+      [explained('Validation accuracy', EXPLAIN.valAccuracy), pct(m.accuracy)],
       [explained('Precision för spam', EXPLAIN.precision), pct(m.precision)],
       [explained('Recall för spam', EXPLAIN.recall), pct(m.recall)],
       [explained('F1 för spam', EXPLAIN.f1), pct(m.f1)],
-      [explained('Träffsäkerhet på träningsdata', EXPLAIN.trainAccuracy), pct(run.train.metrics.accuracy)],
     ],
   });
 }
 
-export function confusionTable(m, caption = 'Förväxlingsmatris') {
+/** Training accuracy mäts på träningsdata och står därför för sig, inte i tabellen över valideringsdata. */
+function trainAccuracyLine(run) {
+  return h('p', { class: 'train-accuracy' }, 'På träningsdata: ', explained('Training accuracy', EXPLAIN.trainAccuracy), ' ', h('strong', { text: pct(run.train.metrics.accuracy) }));
+}
+
+/** errorTypes: visa förklaringen av falskt positivt/negativt under matrisen (bara vid den första på sidan). */
+export function confusionTable(m, caption = 'Förväxlingsmatris', { errorTypes = false } = {}) {
   return h(
     'div',
     { class: 'confusion' },
@@ -72,7 +77,7 @@ export function confusionTable(m, caption = 'Förväxlingsmatris') {
         ),
       ),
     ),
-    h('ul', { class: 'error-types' }, h('li', {}, h('strong', { text: 'Falskt positivt: ' }), 'ett vanligt meddelande klassificeras som spam.'), h('li', {}, h('strong', { text: 'Falskt negativt: ' }), 'spam släpps igenom som vanligt meddelande.')),
+    !errorTypes ? null : h('ul', { class: 'error-types' }, h('li', {}, h('strong', { text: 'Falskt positivt: ' }), 'ett vanligt meddelande klassificeras som spam.'), h('li', {}, h('strong', { text: 'Falskt negativt: ' }), 'spam släpps igenom som vanligt meddelande.')),
   );
 }
 
@@ -118,7 +123,7 @@ function accuracyChart(run) {
     h(
       'figure',
       {},
-      h('figcaption', {}, explained('Träningskurva och valideringskurva: accuracy per epok', EXPLAIN.valAccuracy)),
+      h('figcaption', {}, explained('Training accuracy och validation accuracy per epok', EXPLAIN.accuracy)),
       lineChart({
         series: [{ key: 'train', values: tr }, { key: 'validation', values: va }],
         marker: run.history.length > 1 ? { key: 'validation', index: bestEpochIndex(run.history) } : null,
@@ -138,13 +143,13 @@ function lossChart(run) {
   return h(
     'figure',
     { class: 'charts' },
-    h('figcaption', {}, explained('Förlust (loss) per epok', EXPLAIN.loss)),
+    h('figcaption', {}, explained('Training loss och validation loss per epok', EXPLAIN.loss)),
     lineChart({
       series: [{ key: 'train', values: trl }, { key: 'validation', values: val }],
       yMax: lossMax,
       percent: false,
-      title: `Förlust per epok för ${run.label}`,
-      description: `Efter ${run.settings.epochs} epoker: träningsförlust ${formatNumber(last.trainLoss)}, valideringsförlust ${formatNumber(last.valLoss)}.`,
+      title: `Loss per epok för ${run.label}`,
+      description: `Efter ${run.settings.epochs} epoker: training loss ${formatNumber(last.trainLoss)}, validation loss ${formatNumber(last.valLoss)}.`,
     }),
   );
 }
@@ -158,7 +163,7 @@ function epochTable(run) {
       'div',
       { class: 'table-scroll tall' },
       table({
-        headers: ['Epok', 'Training accuracy', 'Validation accuracy', 'Träningsförlust', 'Valideringsförlust', 'Precision (val.)', 'Recall (val.)', 'F1 (val.)'],
+        headers: ['Epok', 'Training accuracy', 'Validation accuracy', 'Training loss', 'Validation loss', 'Precision (val.)', 'Recall (val.)', 'F1 (val.)'],
         rows: run.history.map((e) => [String(e.epoch), pct(e.trainAccuracy), pct(e.valAccuracy), formatNumber(e.trainLoss), formatNumber(e.valLoss), pct(e.valPrecision), pct(e.valRecall), pct(e.valF1)]),
       }),
     ),
@@ -167,7 +172,8 @@ function epochTable(run) {
 
 /**
  * Ett resultatkort. Det viktigaste (mått, förväxlingsmatris, felen, accuracy-kurvan) syns direkt.
- * Tekniska detaljer (modell, startläge-id, förlustkurva, alla epoker) ligger bakom "Detaljer".
+ * Tekniska detaljer (modell, startläge-id, loss-kurva, alla epoker) ligger bakom "Detaljer".
+ * Egna texter testas i nästa steg (Testa egen text), inte i kortet.
  * I lektion 3 visas tolkningstipsen om under- och överanpassning direkt eftersom de är lektionens fokus.
  */
 function runArticle(run, index, lesson, store) {
@@ -191,13 +197,13 @@ function runArticle(run, index, lesson, store) {
     h('h3', { id: headingId, text: `Körning ${index + 1}: ${run.label}` }),
     h('p', { class: 'run-summary', text: `${run.datasetName} · ${s.epochs} epoker · slumpfrö ${s.seed}` }),
     metricsTable(run),
-    confusionTable(run.validation.metrics, 'Förväxlingsmatris (valideringsdata)'),
+    trainAccuracyLine(run),
+    confusionTable(run.validation.metrics, 'Förväxlingsmatris (valideringsdata)', { errorTypes: index === 0 }),
     misclassifiedTable(run.validation.rows),
-    quickTest(run, store),
     accuracyChart(run),
     notesInMain ? notes : null,
     errorAnalysis(run),
-    h('details', { class: 'only-standard run-details' }, h('summary', { text: 'Detaljer: modell, förlustkurva och värden per epok' }), meta, lossChart(run), notesInMain ? null : notes, epochTable(run)),
+    h('details', { class: 'only-standard run-details' }, h('summary', { text: 'Detaljer: modell, loss-kurva och värden per epok' }), meta, lossChart(run), notesInMain ? null : notes, epochTable(run)),
   );
 }
 
@@ -207,7 +213,8 @@ function comparison(runs, mode) {
   const showLr = mode === 'compare-lr';
   const showHidden = mode === 'compare-hidden';
   const mainRows = [
-    row('Dataset', (r) => r.datasetName),
+    // Raden behövs bara när kolumnrubrikerna inte redan är datasetens namn (t.ex. i lektion 3).
+    runs.every((r) => r.label === r.datasetName) ? null : row('Dataset', (r) => r.datasetName),
     row('Antal epoker', (r) => String(r.settings.epochs)),
     row('Slumpfrö', (r) => String(r.settings.seed)),
     row('Startläge-id', (r) => r.startId),
@@ -232,7 +239,7 @@ function comparison(runs, mode) {
     'div',
     { class: 'comparison' },
     h('h3', { text: 'Jämförelse sida vid sida' }),
-    table({ caption: 'Alla körningar har samma valideringsdata. Skillnader kan bero på slump när underlaget är litet.', headers, rowHeaders: true, rows: mainRows }),
+    table({ caption: 'Alla körningar har samma valideringsdata.', headers, rowHeaders: true, rows: mainRows }),
     techRows.length ? h('details', { class: 'only-standard' }, h('summary', { text: 'Fler tekniska uppgifter' }), table({ headers, rowHeaders: true, rows: techRows })) : null,
   );
 }
@@ -241,9 +248,9 @@ function comparison(runs, mode) {
 function historyBox(history, onClear) {
   if (history.length < 2) return null;
   return h(
-    'div',
+    'details',
     { class: 'history' },
-    h('h3', { text: 'Alla dina körningar hittills' }),
+    h('summary', { text: `Alla dina körningar hittills (${history.length})` }),
     table({
       caption: 'För att jämföra körningar även när du ändrat en inställning och tränat om. Tabellen finns kvar tills du laddar om sidan och tas med i resultatblocket.',
       headers: ['Nr', 'Körning', 'Epoker', 'Frö', 'Validation accuracy', 'Precision', 'Recall', 'Falskt pos.', 'Falskt neg.'],
@@ -289,14 +296,46 @@ function runsView(runs, lesson, store, tabState) {
   );
 }
 
+const SMALL_DATA = 'Ett litet testunderlag (20 valideringstexter) ger osäkra slutsatser: en enda text ändrar accuracy med 5 procentenheter.';
+
+/** Varningsrutans punkter: den om litet underlag alltid, resten efter vad lektionen handlar om. */
+export function cautionPoints(lesson) {
+  const byLesson = {
+    1: ['Hög accuracy betyder inte automatiskt att modellen är bra. Precision och recall visar olika typer av fel.', 'Resultatet beror på träningsdata, slumpfrö och inställningar.'],
+    2: ['Båda modellerna har samma inställningar och samma valideringsdata, så skillnaden kommer från träningsdatan. Men en skillnad på en eller två texter kan också vara slump.'],
+    3: ['Fler epoker ger inte alltid bättre resultat. Jämför training accuracy med validation accuracy för att se om modellen lär sig träningstexterna utantill.'],
+    4: ['En förbättring på valideringsdata behöver inte hålla på nya texter. Därför finns sluttestet.'],
+  };
+  if (byLesson[lesson]) return [SMALL_DATA, ...byLesson[lesson]];
+  return [
+    'Resultatet beror på träningsdata, slumpfrö och inställningar.',
+    SMALL_DATA,
+    'Hög accuracy betyder inte automatiskt att modellen är bra. Precision och recall visar olika typer av fel.',
+    'Resultat på valideringsdata garanterar inte samma resultat på nya texter.',
+    'Fler epoker ger inte alltid bättre resultat. Du måste kunna förklara dina resultat med stöd i dina egna försök.',
+  ];
+}
+
 export function mountResults(root, store, { onCopy }) {
   const body = h('div');
-  root.append(body);
+  // Lektion 5: resultaten finns bara kvar tills sidan laddas om, så eleven läser först in en återställningstext
+  // från en tidigare lektion. Rutan byggs en gång (inte i render) så att meddelandet efter inläsningen finns kvar.
+  const restoreRoot = h('div');
+  const restoreBox = h(
+    'div',
+    { class: 'callout restore-box' },
+    h('h3', { text: 'Börja här: läs in dina resultat' }),
+    h('p', {}, 'Resultaten från tidigare lektioner finns inte kvar i appen. Klistra in återställningstexten från ditt arbetsdokument, till exempel från lektion 4, och träna sedan om. Du får exakt samma resultat som förra gången.'),
+    restoreRoot,
+  );
+  mountRestore(restoreRoot, store, { idPrefix: 'result-', keepLesson: true });
+  root.append(restoreBox, body);
   let last = [];
   let lastRunsForTabs = null;
   const tabState = { index: 0 };
   const render = (state) => {
-    const sig = [state.runs, state.lesson, state.history, state.runsMode];
+    restoreBox.hidden = !(state.lesson === 5 && state.runs.length === 0);
+    const sig = [state.runs, state.lesson, state.history, state.runsMode, state.mode];
     if (sig.every((v, i) => v === last[i])) return;
     last = sig;
     if (state.runs !== lastRunsForTabs) {
@@ -304,8 +343,11 @@ export function mountResults(root, store, { onCopy }) {
       tabState.index = 0;
     }
     const runs = state.runs;
+    const improveFlow = state.runsMode === 'improve' && (state.lesson === 4 || state.lesson === 'all');
+    const retrain = improveFlow ? '#fore-efter' : '#trana';
     if (runs.length === 0) {
-      replace(body, h('p', { class: 'muted', text: 'Inga resultat ännu. Välj inställningar och klicka på "Träna från början" i avsnittet Förbered och träna. I lektion 5 tränar du i lektion 1–4 först.' }));
+      const howTo = state.mode === 'improve' ? 'Klicka på "Träna före och efter" i steget Träna före och efter.' : 'Klicka på "Träna från början" i steget Träna modellen.';
+      replace(body, state.lesson === 5 ? null : h('p', { class: 'muted', text: `Inga resultat ännu. ${howTo}` }));
       return;
     }
     replace(
@@ -314,26 +356,22 @@ export function mountResults(root, store, { onCopy }) {
         'div',
         { class: 'callout only-standard' },
         h('p', {}, h('strong', { text: 'Läs resultaten med försiktighet.' })),
-        h('ul', {}, [
-          'Resultatet beror på träningsdata, slumpfrö och inställningar.',
-          'Ett litet testunderlag (20 valideringstexter) ger osäkra slutsatser: en enda text ändrar accuracy med 5 procentenheter.',
-          'Hög accuracy betyder inte automatiskt att modellen är bra. Precision och recall visar olika typer av fel.',
-          'Resultat på valideringsdata garanterar inte samma resultat på nya texter.',
-          'Fler epoker ger inte alltid bättre resultat. Du måste kunna förklara dina resultat med stöd i dina egna försök.',
-        ].map((t) => h('li', { text: t }))),
+        h('ul', {}, cautionPoints(state.lesson).map((t) => h('li', { text: t }))),
       ),
       h('p', { class: 'callout only-simple' }, h('strong', { text: 'Tänk på: ' }), 'Resultatet beror på träningsdata. 20 valideringstexter är få, så slutsatserna är osäkra. Hög accuracy betyder inte automatiskt en bra modell.'),
       h(
         'div',
         { class: 'button-row result-actions' },
         h('button', { type: 'button', class: 'btn btn-primary', text: 'Kopiera resultatblock', onclick: () => onCopy('result') }),
-        state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: '#testa', text: 'Testa egen text', onclick: (e) => { e.preventDefault(); goToSection('#testa'); } }),
-        state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: '#trana', text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection('#trana'); } }),
+        // I lektion 4 leder knapparna vidare i förbättringsflödet i stället för tillbaka till början.
+        improveFlow ? h('a', { class: 'btn btn-secondary btn-link', href: '#sluttest', text: 'Gå till sluttestet', onclick: (e) => { e.preventDefault(); goToSection('#sluttest'); } }) : null,
+        state.lesson === 5 || improveFlow ? null : h('a', { class: 'btn btn-secondary btn-link', href: '#testa', text: 'Testa egen text', onclick: (e) => { e.preventDefault(); goToSection('#testa'); } }),
+        state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: retrain, text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection(retrain); } }),
       ),
-      // Historiken visas först när det finns äldre körningar utöver de som redan syns nedan.
-      state.history.length > runs.length ? historyBox(state.history, () => store.set({ history: [] })) : null,
       runs.length > 1 ? comparison(runs, state.runsMode) : null,
       runsView(runs, state.lesson, store, tabState),
+      // Historiken (hopfälld, sist) visas först när det finns äldre körningar utöver de som redan syns ovan.
+      state.history.length > runs.length ? historyBox(state.history, () => store.set({ history: [] })) : null,
       h('p', { class: 'muted only-standard', text: `Modellbeskrivning: ${architectureText(runs[0])}` }),
     );
   };

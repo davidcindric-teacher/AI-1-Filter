@@ -21,8 +21,8 @@ function mountSeed(root, store) {
   const btn = h('button', { type: 'button', class: 'btn btn-primary', text: `Kör med ${SEED_COUNT} olika frön`, onclick: () => startSeedExperiment(store) });
   const out = h('div');
   root.append(
-    h('h4', { text: 'Frö-experiment' }),
-    h('p', {}, 'Ett resultat beror delvis på slumpen (startvikter och ordning på träningstexterna). Här tränas samma modell med samma data och inställningar men med ', String(SEED_COUNT), ' olika slumpfrön i följd. Då ser du hur mycket resultatet varierar bara på grund av slumpen. Passar särskilt bra efter Lektion 1 och 2.'),
+    h('h3', { text: 'Frö-experiment' }),
+    h('p', {}, 'Ett resultat beror delvis på slumpen (startvikter och ordning på träningstexterna). Här tränas samma modell med samma data och inställningar men med ', String(SEED_COUNT), ' olika slumpfrön i följd. Då ser du hur mycket resultatet varierar bara på grund av slumpen.'),
     info,
     h('div', { class: 'button-row' }, btn),
     out,
@@ -65,7 +65,7 @@ function mountThreshold(root, store) {
   const range = h('input', { type: 'range', id: 'thr-range', min: '1', max: '99', step: '1', value: '50', 'aria-describedby': 'thr-help' });
   const output = h('output', { id: 'thr-value', for: 'thr-range', class: 'thr-value', text: '50 %' });
   const out = h('div', { 'aria-live': 'polite' });
-  const noRuns = h('p', { class: 'muted', text: 'Träna en modell först (avsnittet Förbered och träna).' });
+  const noRuns = h('p', { class: 'muted', text: 'Träna en modell först (steget Träna modellen).' });
   const controls = h(
     'div',
     {},
@@ -76,8 +76,8 @@ function mountThreshold(root, store) {
   );
 
   root.append(
-    h('h4', { text: 'Tröskelreglage' }),
-    h('p', {}, 'Modellen ger en sannolikhet för spam. Tröskeln bestämmer när det räknas som spam. Vad händer med precision, recall och de två typerna av fel om du flyttar tröskeln? Passar bra efter Lektion 1.'),
+    h('h3', { text: 'Tröskelreglage' }),
+    h('p', {}, 'Modellen ger en sannolikhet för spam. Tröskeln bestämmer när det räknas som spam. Vad händer med precision, recall och de två typerna av fel om du flyttar tröskeln?'),
     noRuns,
     controls,
     out,
@@ -119,7 +119,7 @@ function mountThreshold(root, store) {
         headers: ['Tröskel', 'Precision', 'Recall', 'Falskt positiva', 'Falskt negativa'],
         rows: sweepThresholds(run.validation.rows).map((s) => [`${Math.round(s.threshold * 100)} %`, pct(s.metrics.precision), pct(s.metrics.recall), String(s.metrics.fp), String(s.metrics.fn)]),
       })),
-      h('p', { class: 'muted', text: `Ett lägre tröskelvärde ger fler svar "spam" (fler falskt positiva, färre falskt negativa). Ett högre ger tvärtom. Vilken sorts fel är värst? Det beror på situationen. Med bara ${m.n} texter är detta ungefärligt.` }),
+      h('p', { class: 'muted', text: `Ett lägre tröskelvärde ger fler svar "spam" (fler falskt positiva, färre falskt negativa). Ett högre ger tvärtom. Vilken sorts fel är värst? Det beror på situationen.` }),
     );
   }
 
@@ -158,14 +158,10 @@ function mountChallenges(root, store) {
 
 export function mountExtra(root, store) {
   // Varje del visas bara i de lektioner den hör till (data-lessons). "Alla" visar allt.
+  // Delarna har egna H3-rubriker (inga "Lektion N"-rubriker), så att rubriknivåerna stämmer i varje lektion.
   const part = (lessons) => {
     const el = h('div', { class: 'extra-part' });
     el.dataset.lessons = lessons;
-    return el;
-  };
-  const heading = (n) => {
-    const el = h('h3', { text: `Lektion ${n}` });
-    el.dataset.lessons = `${n} all`;
     return el;
   };
   const seed = part('1 2 4');
@@ -177,18 +173,13 @@ export function mountExtra(root, store) {
   const analysis = part('5');
   const ch = part('1 2 3 4 5');
   root.append(
-    h('p', {}, 'Extra fördjupning för dig som blir klar tidigt. Ingenting här ändrar dina vanliga resultat i avsnittet Resultat. Frö- och tröskelexperiment tas med i resultatblocket.'),
-    heading(1),
+    h('p', {}, 'Fördjupning för dig som blir klar tidigt. Ingenting här ändrar dina vanliga resultat i steget Resultat. Frö- och tröskelexperiment tas med i resultatblocket.'),
     seed,
     thr,
-    heading(2),
     words,
     mix,
-    heading(3),
     epochsInfo,
-    heading(4),
     improve,
-    heading(5),
     analysis,
     ch,
   );
@@ -197,8 +188,8 @@ export function mountExtra(root, store) {
   mountWords(words, store);
   mountMix(mix, store);
   epochsInfo.append(
-    h('h4', { text: 'Fler jämförelser och markerad bästa epok' }),
-    h('p', {}, 'I resultaten är epoken med högst validation accuracy markerad i diagrammet. Tänk på att valet är osäkert med så få valideringstexter. Under ', h('a', { href: '#installningar', text: 'Inställningar' }), ' finns dessutom utökade laborationer där du jämför learning rate (0,01, 0,1 och 0,5) eller antal dolda noder (2, 8 och 32). Välj dem under "Utökade laborationer".'),
+    h('h3', { text: 'Fler jämförelser och markerad bästa epok' }),
+    h('p', {}, 'I resultaten är epoken med högst validation accuracy markerad i diagrammet. I steget ', h('a', { href: '#installningar', text: 'Välj inställningar' }), ' finns dessutom utökade laborationer där du jämför learning rate (0,01, 0,1 och 0,5) eller antal dolda noder (2, 8 och 32). Välj dem under "Utökade laborationer".'),
   );
   mountImproveSeeds(improve, store);
   mountAnalysis(analysis, store);

@@ -20,6 +20,9 @@ export function createStore(initial) {
 export const initialState = () => ({
   view: 'standard', // 'standard' | 'simple' (bara presentation, påverkar inte modell eller resultat)
   lesson: 1, // 1–5 eller 'all' (visar hela appen). Styr vilka avsnitt och laborationer som visas.
+  screen: 'home', // 'home' (startskärm med lektionsval) | 'lesson' (den valda lektionen). Sparas inte.
+  allUnlocked: false, // "Visa alla avsnitt" upplåst (bara denna session)
+  finalTestUnlocked: false, // sluttestet upplåst för en körning (låses igen när det körts)
   mode: 'single',
   datasetKey: 'a',
   settings: { seed: DEFAULTS.seed, epochs: DEFAULTS.epochs, learningRate: DEFAULTS.learningRate, batchSize: DEFAULTS.batchSize, hiddenUnits: DEFAULTS.hiddenUnits },

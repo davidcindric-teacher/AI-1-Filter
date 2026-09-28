@@ -8,10 +8,11 @@ import { startTraining } from './train.js';
  * "Byt ut" öppnar en textruta för just den raden. En ändrad text visas åter som kompakt förhandsvisning
  * med en "Ändrad"-badge och en "Redigera"-knapp, så bara de rader eleven aktivt jobbar med tar plats.
  */
-export function mountEditor(root, store) {
+export function mountEditor(root, trainRoot, store) {
   const rowEls = new Map(); // id -> radens delar
   const expanded = new Set(); // id:n som just nu visar en öppen textruta
   const summary = h('div', { class: 'edit-summary', role: 'status', 'aria-live': 'polite' });
+  const trainStatus = h('div');
   const problems = h('ul', { class: 'problems' });
   const changesList = h('div');
 
@@ -59,7 +60,7 @@ export function mountEditor(root, store) {
   const trainBtn = h('button', {
     type: 'button',
     class: 'btn btn-primary',
-    text: 'Träna före och efter (Lektion 4)',
+    text: 'Träna före och efter',
     onclick: () => {
       store.set({ mode: 'improve' });
       startTraining(store);
@@ -68,13 +69,19 @@ export function mountEditor(root, store) {
 
   root.append(
     h('p', {}, 'Utgå från dataset B och byt ut exakt ', h('strong', { text: `${SWAP_COUNT} texter i varje klass` }), ' mot egna påhittade texter som du tror gör modellen bättre. Klasserna ligger fast: en spamtext byts mot en spamtext och en vanlig text mot en vanlig text. Datamängden ska fortfarande ha exakt ', String(CLASS_SIZE), ' spamtexter och ', String(CLASS_SIZE), ' vanliga texter.'),
+    h('p', { class: 'callout' }, h('strong', { text: 'Tips: ' }), 'Vilka texter klassificerade modellen fel med dataset B i lektion 2 och 3? Titta i dina resultatblock på de felklassificerade texterna. Vilka ord saknades i träningsdatan? Byt ut texter som liknar varandra mot texter med sådana ord.'),
     h('p', { class: 'muted only-standard', text: 'Texter som är identiska med valideringsdata eller sluttestet, tomma texter och dubbletter nekas.' }),
     summary,
     problems,
-    h('div', { class: 'button-row' }, trainBtn, resetAll),
-    h('p', { class: 'muted only-standard', text: 'Båda modellerna (före och efter) tränas från samma startläge, med samma slumpfrö, antal epoker och valideringsdata som du valt i steget Välj inställningar.' }),
     changesList,
     h('div', { class: 'edit-groups' }, group('spam', 'Spamtext'), group('vanlig', 'Vanlig text')),
+    h('div', { class: 'button-row' }, resetAll),
+  );
+  trainRoot.append(
+    h('p', {}, 'Nu tränas två modeller: en på dataset B (före) och en på din förbättrade version (efter). Resultaten visas sida vid sida i steget Resultat.'),
+    trainStatus,
+    h('div', { class: 'button-row' }, trainBtn),
+    h('p', { class: 'muted only-standard', text: 'Båda modellerna tränas från samma startläge, med samma slumpfrö, antal epoker och valideringsdata som du valt i steget Välj inställningar.' }),
   );
 
   // Uppdaterar varje rads utseende (öppen/stängd, badge, förhandsvisning). Körs alltid, även när "expanded"
@@ -117,6 +124,13 @@ export function mountEditor(root, store) {
       check.ok ? h('p', { class: 'ok', text: 'Datamängden är giltig och kan tränas.' }) : h('p', { class: 'warn', text: 'Datamängden är inte klar än:' }),
     );
     replace(problems, check.ok ? null : check.problems.map((p) => h('li', { text: p })));
+    replace(
+      trainStatus,
+      check.ok
+        ? h('p', { class: 'ok', text: 'Din förbättrade datamängd är giltig och kan tränas.' })
+        : h('p', { class: 'warn' }, 'Datamängden är inte klar än. ', h('a', { href: '#byt-texter', text: 'Gå tillbaka till steget Byt ut texter' })),
+    );
+    trainBtn.disabled = !check.ok;
     const eff = effectiveEdits(state.edits);
     const changed = BASE_ROWS.filter((r) => r.id in eff);
     replace(

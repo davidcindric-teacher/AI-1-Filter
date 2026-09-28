@@ -54,14 +54,14 @@ export function buildPlan({ mode, datasetKey, settings, edits, mixIds = [] }) {
   const custom = () => {
     const check = validateCustomDataset(edits);
     if (!check.ok) {
-      throw new UserError('Den förbättrade datamängden är inte giltig. Åtgärda felen i avsnittet Skapa egen förbättrad data först.', check.problems);
+      throw new UserError('Den förbättrade datamängden är inte giltig. Åtgärda felen i steget Byt ut texter först.', check.problems);
     }
     return { key: 'custom', name: 'Dataset B (förbättrad)', version: DATASETS.b.version, texts: applyEdits(edits) };
   };
 
   const mix = () => {
     const check = validateMix(mixIds);
-    if (!check.ok) throw new UserError('Dataset C är inte giltigt. Välj exakt 20 spamtexter och 20 vanliga texter i avsnittet Extra (Lektion 2).', check.problems);
+    if (!check.ok) throw new UserError('Dataset C är inte giltigt. Välj exakt 20 spamtexter och 20 vanliga texter i steget Fördjupning (lektion 2).', check.problems);
     return mixDataset(mixIds);
   };
   const fmt = (v) => String(v).replace('.', ',');

@@ -2,7 +2,7 @@ import './styles.css';
 import { APP_VERSION, DATASET_KEYS, LIMITS, MODES } from './config.js';
 import { normalizeMixIds } from './mixData.js';
 import { BASE_ROWS } from './customData.js';
-import { allowedDatasets, isValidLesson } from './lessons.js';
+import { allowedDatasets, isUnlocked, isValidLesson, modeForLesson } from './lessons.js';
 import { initialState, createStore } from './state.js';
 import { loadConvenience, saveConvenience } from './storage.js';
 import { h, replace, $ } from './ui/dom.js';
@@ -16,7 +16,7 @@ import { mountFinalTest } from './ui/finalTest.js';
 import { mountSave } from './ui/save.js';
 import { mountExtra } from './ui/extra.js';
 import { mountLessons } from './ui/lessonPicker.js';
-import { goToSection } from './ui/nav.js';
+import { mountStepper } from './ui/stepper.js';
 
 /** Kontrollerar att webbläsaren har det som behövs. Returnerar ett felmeddelande eller null. */
 function checkSupport() {
@@ -48,6 +48,11 @@ function restoreConvenience(state) {
   if (saved.edits && typeof saved.edits === 'object') {
     const known = new Set(BASE_ROWS.map((r) => r.id));
     next.edits = Object.fromEntries(Object.entries(saved.edits).filter(([id, t]) => known.has(id) && typeof t === 'string'));
+  }
+  // "Alla" är bara upplåst under en session, så en sparad "Alla" byts mot lektion 1.
+  if (!isUnlocked(next, next.lesson)) {
+    next.lesson = 1;
+    next.mode = modeForLesson(next.lesson, next.mode);
   }
   if (!allowedDatasets(next.lesson).includes(next.datasetKey)) next.datasetKey = 'a';
   return next;
@@ -90,14 +95,14 @@ function mountViewToggle(store) {
   render(store.get());
 }
 
-/** Hamburgarmeny till vänster med genvägar till alla avsnitt. Fungerar med tangentbord (Esc stänger, Tab hålls inne i menyn). */
+/** Hamburgarmeny till vänster med lektionsval och lektionsguide. Fungerar med tangentbord (Esc stänger, Tab hålls inne i menyn). */
 function mountMenu() {
-  // returnerar close så att guiden i menyn kan stänga den vid navigering
+  // returnerar close så att guiden och lektionsvalet i menyn kan stänga den vid navigering
   const btn = $('#menu-btn');
   const drawer = $('#menu-drawer');
   const backdrop = $('#menu-backdrop');
   const closeBtn = $('#menu-close');
-  const focusables = () => [closeBtn, ...drawer.querySelectorAll('a')].filter((el) => el.offsetParent !== null);
+  const focusables = () => [...drawer.querySelectorAll('a, button, input')].filter((el) => el.offsetParent !== null && !el.disabled);
   // Allt utom menyn och bakgrunden döljs för assistivteknik medan menyn är öppen (den täcker dem ändå visuellt).
   // Utan detta fångar Tab-fällan nedan bara tangentbordet: en skärmläsares pilnavigering (virtuell markör)
   // hade fortfarande kunnat nå knappar bakom bakgrunden.
@@ -109,7 +114,7 @@ function mountMenu() {
     for (const el of backgroundEls) el.inert = true;
     btn.setAttribute('aria-expanded', 'true');
     document.body.classList.add('menu-open');
-    drawer.querySelector('a')?.focus();
+    focusables()[1]?.focus(); // första valet efter Stäng-knappen
   };
   const close = ({ restoreFocus = true } = {}) => {
     if (drawer.hidden) return;
@@ -141,13 +146,6 @@ function mountMenu() {
       }
     }
   });
-  for (const link of drawer.querySelectorAll('a')) {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      close({ restoreFocus: false });
-      goToSection(link.getAttribute('href'));
-    });
-  }
   return { close: () => close({ restoreFocus: false }) };
 }
 
@@ -155,8 +153,16 @@ function start() {
   $('#app-version').textContent = APP_VERSION;
   const unsupported = checkSupport();
   const restored = restoreConvenience(initialState());
-  const store = createStore({ ...restored, unsupported });
+  // Startskärmen visas vid varje besök, utom när adressen pekar på ett steg (t.ex. efter omladdning mitt i en lektion).
+  const store = createStore({ ...restored, unsupported, screen: location.hash.length > 1 ? 'lesson' : 'home' });
   mountErrors(store);
+  // Hoppa till innehållet: på startskärmen är main dold, så länken går då till lektionsvalet i stället.
+  $('.skip-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = store.get().screen === 'home' ? $('#home-heading') : $('#main');
+    target.focus();
+    target.scrollIntoView();
+  });
   mountViewToggle(store);
   const menu = mountMenu();
   if (unsupported) store.set({ error: { message: unsupported, details: [] } });
@@ -167,10 +173,11 @@ function start() {
   const saveApi = mountSave($('#mount-save'), store);
   mountResults($('#mount-results'), store, { onCopy: (kind) => saveApi.copy(kind) });
   mountTester($('#mount-tester'), store);
-  mountEditor($('#mount-editor'), store);
+  mountEditor($('#mount-editor'), $('#mount-improve-train'), store);
   mountFinalTest($('#mount-final'), store);
   mountExtra($('#mount-extra'), store);
   mountLessons(store, { closeMenu: menu.close });
+  mountStepper(store);
 
   // Extra bekvämlighet: spara inställningar och egna ändringar (aldrig resultat). Kan misslyckas utan att appen påverkas.
   let timer = null;

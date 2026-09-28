@@ -1,7 +1,7 @@
 // Korta förklaringar på svenska som visas när eleven öppnar en "?"-ruta.
 export const EXPLAIN = {
   accuracy:
-    'Accuracy är andelen av alla texter som modellen klassificerade rätt: (sant positiva + sant negativa) / alla texter. Ett högt värde betyder inte automatiskt att modellen är bra: den kan till exempel missa nästan allt spam och ändå få högt värde om det mesta är vanliga meddelanden.',
+    'Accuracy (på svenska ungefär träffsäkerhet) är andelen av alla texter som modellen klassificerade rätt: (sant positiva + sant negativa) / alla texter. Ett högt värde betyder inte automatiskt att modellen är bra: den kan till exempel missa nästan allt spam och ändå få högt värde om det mesta är vanliga meddelanden.',
   precision:
     'Precision för spam: av alla texter som modellen kallade spam, hur många var verkligen spam? Sant positiva / (sant positiva + falskt positiva). Låg precision betyder att många vanliga meddelanden felaktigt hamnar i skräpposten.',
   recall:
@@ -14,11 +14,11 @@ export const EXPLAIN = {
   confusion:
     'Förväxlingsmatrisen visar hur många texter som hamnade i varje ruta: raderna är den riktiga klassen och kolumnerna är modellens svar. Rutorna med rätt svar är sant positiva och sant negativa. De andra två rutorna är modellens två typer av fel.',
   trainAccuracy:
-    'Träffsäkerhet på träningsdata (training accuracy) visar hur väl modellen klarar texterna den har tränat på. Den säger inte hur modellen klarar nya texter.',
+    'Training accuracy är accuracy på träningsdata: hur väl modellen klarar texterna den har tränat på. Den säger inte hur modellen klarar nya texter.',
   valAccuracy:
-    'Träffsäkerhet på valideringsdata (validation accuracy) visar hur modellen klarar 20 texter som den inte har tränat på. Med så få texter är värdet osäkert: en enda text ändrar det med 5 procentenheter.',
+    'Validation accuracy är accuracy på valideringsdata: hur väl modellen klarar 20 texter som den inte har tränat på.',
   loss:
-    'Förlust (loss) mäter hur långt modellens sannolikheter ligger från rätt svar. Lägre är bättre. Den visar ofta mer än accuracy, eftersom den också tar hänsyn till hur säker modellen är.',
+    'Loss (på svenska ungefär förlust) mäter hur långt modellens sannolikheter ligger från rätt svar. Lägre är bättre. Den visar ofta mer än accuracy, eftersom den också tar hänsyn till hur säker modellen är.',
   epoch: 'En epok är en genomgång av alla träningstexter. Efter varje epok justeras vikterna lite grann.',
   seed:
     'Slumpfröet bestämmer startvikterna och ordningen på träningstexterna. Samma frö och samma inställningar ger exakt samma resultat varje gång. Ett annat frö kan ge ett annat resultat, även med samma data.',

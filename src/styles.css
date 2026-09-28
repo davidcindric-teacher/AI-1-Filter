@@ -30,6 +30,8 @@
 [data-view='simple'] .explain-btn,
 [data-view='simple'] .explain,
 [data-view='simple'] .hint { display: none !important; }
+/* Lektion 5: analysmallen i Fördjupning behövs även i Förenklad visning. */
+[data-view='simple'][data-lesson='5'] #extra.only-standard { display: block !important; }
 
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 4.5rem; }
 
@@ -281,7 +283,8 @@ progress { width: 100%; height: 1.5rem; accent-color: var(--accent); }
 .run-summary { margin: -0.3rem 0 0.8rem; color: var(--muted); font-weight: 600; }
 figure.charts { margin: 1rem 0; }
 .run-details { margin-top: 1rem; border: 1px solid var(--border); border-radius: var(--radius); padding: 0 1rem 0.75rem; }
-.history { margin-block: 1.25rem; }
+.history { margin-block: 1.5rem 0; border: 1px solid var(--border); border-radius: var(--radius); padding: 0 1rem 0.75rem; }
+.train-accuracy { margin: -0.5rem 0 1rem; }
 .test-counter { font-weight: 700; color: var(--accent-dark); }
 
 /* Lektionsväljare och guide */
@@ -308,19 +311,55 @@ figure.charts { margin: 1rem 0; }
 .drawer-sub { font-weight: 800; margin: 0.5rem 0 0.4rem; }
 .drawer .guide-item { font-size: 0.95rem; }
 .drawer .guide-goto { display: none; }
+/* Startskärm (bara lektionsval) och lektionsvy. data-screen sätts på <html>. */
+[data-screen='home'] main,
+[data-screen='home'] .lesson-head,
+[data-screen='home'] #guide-drawer-block,
+[data-screen='lesson'] .home { display: none !important; }
+.home { padding-block: 0.5rem 1rem; }
+.lesson-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
+.lesson-card { appearance: none; display: flex; flex-direction: column; gap: 0.3rem; width: 100%; height: 100%; text-align: left; font: inherit; color: var(--text); background: #fff; border: 2px solid var(--border); border-top: 5px solid var(--accent); border-radius: var(--radius); padding: 0.9rem 1.1rem 1.1rem; cursor: pointer; touch-action: manipulation; }
+.lesson-card:hover { border-color: var(--accent); background: var(--soft); }
+.lesson-card-num { font-weight: 700; color: var(--accent-dark); font-size: 0.95rem; }
+.lesson-card-title { font-weight: 800; font-size: 1.3rem; line-height: 1.25; }
+.lesson-card-goal { color: var(--muted); font-size: 1rem; }
+.lesson-all { margin: 1.25rem 0 0; }
+
+/* Lärarkod */
+.code-gate { margin-block: 1rem; padding: 0.75rem 1rem; border: 2px solid #b26a00; border-radius: var(--radius); background: var(--warn-bg); color: #3d2600; }
+.code-gate-title { font-weight: 800; margin: 0 0 0.3rem; }
+.code-gate .muted { color: #5a3a00; }
+.code-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.code-row .code-input { width: 12rem; max-width: 100%; }
+.code-error { margin: 0.4rem 0 0; font-weight: 700; color: var(--error-text); }
+.code-error:empty { display: none; }
+.lesson-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 0.5rem 1rem; margin-top: 0.5rem; }
+.lesson-heading { font-size: 1.4rem; margin: 0 0 0.2rem; }
+.lesson-head .lesson-goal { margin: 0; }
+#guide-page-block { padding: 0.25rem 1rem 0.75rem; margin-block: 1rem; }
+.restore-box { margin-bottom: 1.5rem; }
+.save-more { margin-top: 1.25rem; }
+.restore-box h3 { margin-top: 0.25rem; }
+
+/* Steg-för-steg-visning (när en lektion är vald): ett steg i taget */
+.stepper-on .step-hidden { display: none !important; }
+.stepper-on main > section { border-bottom: 0; padding-block: 1rem 0; }
+.stepper { padding-top: 0.5rem; }
+.stepper-count { font-weight: 800; color: var(--accent-dark); margin: 0 0 0.5rem; }
+.stepper-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; position: relative; }
+.stepper-step { background: #fff; color: var(--accent-dark); padding-inline: 0.75rem; }
+.stepper-step[aria-current='step'] { background: var(--accent); color: #fff; }
+.stepper-num { font-weight: 800; }
+.stepper-name { font-weight: 600; }
+.stepper-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.stepper-nav .btn-primary { margin-left: auto; }
 #error-region .banner { margin: 0.4rem 0; max-height: 40vh; overflow-y: auto; }
 #error-region:empty { display: none; }
 
-/* Interaktiv modelldemo och snabbtest i resultatkortet */
+/* Interaktiv modelldemo */
 .model-demo { margin-top: 1.5rem; border-top: 2px solid var(--border); padding-top: 1rem; }
 .demo-tokens { font-size: 1.05rem; line-height: 2.1; }
 .demo-out { min-height: 2.5rem; }
-.quick-test { margin: 1.25rem 0; border: 1px dashed var(--accent); border-radius: var(--radius); padding: 0.75rem 1rem 1rem; background: var(--soft); }
-.quick-test h4 { margin-top: 0; }
-.quick-test-out { min-height: 1.5rem; margin-top: 0.5rem; }
-.verdict-compact { font-size: 1.05rem; padding: 0.4rem 0.7rem; display: inline-block; }
-.banner-compact { padding: 0.5rem 0.75rem; margin: 0.4rem 0; }
-.btn-link-plain { background: none; border: none; color: var(--accent-dark); font-weight: 600; text-decoration: underline; min-height: 44px; padding-inline: 0.25rem; }
 .intro-teaser { font-size: 1.1rem; margin-bottom: 0.5rem; }
 
 /* Extra */
@@ -371,4 +410,17 @@ figure.charts { margin: 1rem 0; }
   .btn-small { width: auto; }
   .button-row { flex-direction: column; }
   .wrap { padding-inline: 1rem; }
+  /* Bara stegnummer på smal skärm. Namnet döljs bara visuellt, så att skärmläsare fortfarande läser upp det. */
+  .stepper-name { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .stepper-step { min-width: 44px; }
+  /* Alla steg på en rad som kan svepas i sidled (lektion 4 har 11 steg). Aktuellt steg rullas fram av stepper.js. */
+  .stepper-list { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.3rem; -webkit-overflow-scrolling: touch; }
+  .stepper-list li { flex: none; }
+  /* Inne i en lektion: mindre sidhuvud så att innehållet börjar högre upp. Sidtiteln finns kvar för skärmläsare. */
+  [data-screen='lesson'] .site-header .eyebrow { display: none; }
+  [data-screen='lesson'] .site-header h1 { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  [data-screen='lesson'] .site-header { padding-top: 0.25rem; }
+  .lesson-heading { font-size: 1.25rem; }
+  .stepper-nav { flex-direction: column-reverse; }
+  .stepper-nav .btn-primary { margin-left: 0; }
 }

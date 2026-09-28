@@ -13,11 +13,11 @@ const parseNumber = (raw) => {
 };
 
 const LESSON_HELP = {
-  single: 'Träna en modell på ett dataset. Testa sedan fyra egna påhittade meddelanden i avsnittet Testa egen text.',
+  single: 'Träna en modell på ett dataset. Testa sedan fyra egna påhittade meddelanden i steget Testa egen text.',
   'compare-datasets': 'Tränar dataset A och dataset B som två separata modeller med samma slumpfrö, valideringsdata, arkitektur och antal epoker. Resultaten visas sida vid sida.',
   'compare-epochs': `Tränar dataset B tre gånger: ${EPOCH_COMPARISON.join(', ')} epoker. Varje körning börjar om från samma startläge och fortsätter inte från en tidigare körning.`,
-  improve: 'Tränar dataset B före och efter din förbättring (avsnittet Skapa egen förbättrad data), med samma inställningar. Sedan kan du köra det låsta sluttestet.',
-  'compare-abc': 'Tränar dataset A, B och ditt eget mix C (välj texter i avsnittet Extra, Lektion 2). Alla med samma slumpfrö, epoker och valideringsdata. Vad händer när du själv väljer träningstexterna?',
+  improve: 'Tränar dataset B före och efter din förbättring (steget Byt ut texter), med samma inställningar. Sedan kan du köra sluttestet, ett engångstest.',
+  'compare-abc': 'Tränar dataset A, B och ditt eget mix C (välj texter i steget Fördjupning). Alla med samma slumpfrö, epoker och valideringsdata. Vad händer när du själv väljer träningstexterna?',
   'compare-lr': `Tränar dataset B tre gånger med learning rate ${LR_COMPARISON.map((v) => String(v).replace('.', ',')).join(', ')}. Allt annat är lika, inklusive slumpfrö och startvikter. Titta på hur kurvorna skiljer sig.`,
   'compare-hidden': `Tränar dataset B tre gånger med ${HIDDEN_COMPARISON.join(', ')} dolda noder. Samma slumpfrö används, men startvikterna skiljer sig eftersom nätverken har olika storlek.`,
 };

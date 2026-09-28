@@ -5,7 +5,7 @@ export const LESSONS = Object.freeze({
   1: { title: 'Grundmodell', goal: 'Träna en modell på dataset A och testa fyra egna påhittade meddelanden.' },
   2: { title: 'Träningsdata', goal: 'Jämför dataset A och B: samma inställningar men olika träningsdata.' },
   3: { title: 'Antal epoker', goal: 'Träna dataset B med 5, 30 och 100 epoker och undersök kurvorna.' },
-  4: { title: 'Förbättring och sluttest', goal: 'Förbättra dataset B, jämför före och efter och kör det låsta sluttestet en gång.' },
+  4: { title: 'Förbättring och sluttest', goal: 'Förbättra dataset B, jämför före och efter och kör sluttestet en gång.' },
   5: { title: 'Individuell analys', goal: 'Analysera dina resultat i ditt eget arbetsdokument. Appen ger tabeller och en analysmall.' },
 });
 export const LESSON_KEYS = Object.freeze([1, 2, 3, 4, 5]);
@@ -27,6 +27,9 @@ export function allowedDatasets(lesson) {
 }
 
 export const isValidLesson = (v) => v === 'all' || LESSON_KEYS.includes(v);
+
+/** Alla lektioner är öppna. Bara "Alla" låses upp med lärarkoden. */
+export const isUnlocked = (state, lesson) => lesson !== 'all' || state.allUnlocked;
 
 export function lessonOfMode(mode) {
   for (const [lesson, modes] of Object.entries(LESSON_MODES)) if (modes.includes(mode)) return Number(lesson);
@@ -82,15 +85,15 @@ export function guideSteps(lesson, s) {
       ];
     case 4:
       return [
-        auto('l4-data', '#egen-data', 'Byt ut fem texter per klass så att datamängden är giltig', validateCustomDataset(s.edits).ok),
-        auto('l4-train', '#egen-data', 'Träna före och efter förbättringen', trained(['improve'])),
-        auto('l4-final', '#egen-data', 'Kör sluttestet en gång', s.finalTestRuns >= 1),
-        manual('l4-compare', '#egen-data', 'Jämför före och efter på både valideringsdata och sluttest i ditt dokument'),
+        auto('l4-data', '#byt-texter', 'Byt ut fem texter per klass så att datamängden är giltig', validateCustomDataset(s.edits).ok),
+        auto('l4-train', '#fore-efter', 'Träna före och efter förbättringen', trained(['improve'])),
+        auto('l4-final', '#sluttest', 'Kör sluttestet en gång', s.finalTestRuns >= 1),
+        manual('l4-compare', '#sluttest', 'Jämför före och efter på både valideringsdata och sluttest i ditt dokument'),
         copyStep,
       ];
     default:
       return [
-        auto('l5-template', '#extra', 'Kopiera analysmallen (avsnittet Extra)', s.copied.analysis),
+        auto('l5-template', '#extra', 'Kopiera analysmallen (steget Fördjupning)', s.copied.analysis),
         manual('l5-write', '#spara', 'Skriv din analys i ditt dokument. Varje påstående ska stödjas av dina egna siffror'),
         manual('l5-review', '#extra', 'Byt analys med en kamrat och granska med checklistan'),
         auto('l5-copy', '#spara', 'Kopiera resultatblock och återställningstext', copied),

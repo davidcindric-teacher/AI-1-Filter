@@ -13,8 +13,8 @@ const text = (attrs, content) => {
 };
 
 export const SERIES_STYLE = {
-  train: { name: 'Träning', stroke: '#1b6b45', dash: '', width: 3 },
-  validation: { name: 'Validering', stroke: '#22303c', dash: '8 5', width: 3 },
+  train: { name: 'Training', stroke: '#1b6b45', dash: '', width: 3 },
+  validation: { name: 'Validation', stroke: '#22303c', dash: '8 5', width: 3 },
 };
 
 /**
@@ -90,7 +90,7 @@ export function legend(h, { marker = false } = {}) {
     ...['train', 'validation'].map((k) => {
       const st = SERIES_STYLE[k];
       const sample = svg('svg', { width: 36, height: 10, 'aria-hidden': 'true' }, svg('line', { x1: 0, x2: 36, y1: 5, y2: 5, stroke: st.stroke, 'stroke-width': st.width, 'stroke-dasharray': st.dash }));
-      return h('li', {}, sample, ` ${st.name}${k === 'validation' ? 'skurva (streckad)' : 'skurva (heldragen)'}`);
+      return h('li', {}, sample, ` ${st.name} (${k === 'validation' ? 'streckad' : 'heldragen'} linje)`);
     }),
     markerItem,
   );

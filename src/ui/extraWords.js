@@ -9,7 +9,7 @@ const signed = (v) => `${v > 0 ? '+' : ''}${formatNumber(v, 2)}`;
 export function mountWords(root, store) {
   const select = h('select', { id: 'words-model' });
   const out = h('div');
-  const noRuns = h('p', { class: 'muted', text: 'Träna en modell först (avsnittet Förbered och träna).' });
+  const noRuns = h('p', { class: 'muted', text: 'Träna en modell först (steget Träna modellen).' });
   const controls = h('div', { class: 'field' }, h('label', { for: 'words-model', text: 'Modell' }), select);
 
   const render = () => {
@@ -32,7 +32,7 @@ export function mountWords(root, store) {
   };
 
   root.append(
-    h('h4', { text: 'Ordvikter: vilka ord styr modellen?' }),
+    h('h3', { text: 'Ordvikter: vilka ord styr modellen?' }),
     h('p', {}, 'Här ser du vilka ord som mest får modellen att svara spam eller vanligt. Det visar att modellen räknar med ord och inte förstår innehållet.'),
     noRuns,
     controls,

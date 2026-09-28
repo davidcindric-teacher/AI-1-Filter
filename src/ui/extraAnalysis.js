@@ -18,7 +18,7 @@ export function mountAnalysis(root, store) {
   };
 
   root.append(
-    h('h4', { text: 'Analysmall och kamratgranskning' }),
+    h('h3', { text: 'Analysmall och kamratgranskning' }),
     h('p', {}, 'Analysmallen ger dig rubriker och stödfrågor med dina egna siffror ifyllda från körningarna i appen. Appen skriver ingen analys åt dig. Tolkningar och slutsatser skriver du själv i ditt dokument.'),
     h(
       'div',
@@ -28,7 +28,7 @@ export function mountAnalysis(root, store) {
     ),
     status,
     details,
-    h('h4', { text: 'Kamratgranskning: fråga om en kamrats analys' }),
+    h('h3', { text: 'Kamratgranskning: fråga om en kamrats analys' }),
     h('ol', { class: 'checklist' }, PEER_REVIEW_CHECKLIST.map((q) => h('li', { text: q }))),
   );
 }

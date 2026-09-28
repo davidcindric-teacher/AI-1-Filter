@@ -13,6 +13,10 @@ export const CLASS_SIZE = 20; // exakt antal träningstexter per klass
 export const SWAP_COUNT = 5; // exakt antal texter som ska bytas ut per klass i lektion 4
 export const MAX_TEXT_LENGTH = 300;
 
+// Lärarkod som låser upp "Visa alla avsnitt" och sluttestet. Ingen säkerhet (koden syns i källkoden),
+// bara en tröskel så att eleverna inte hoppar före. Byt här.
+export const TEACHER_CODE = '6767';
+
 export const THRESHOLD = 0.5; // sannolikhet för spam >= tröskeln => "spam"
 // Valt som ett representativt frö (nära medelvärdet över 40 testade frön), inte för att ge bäst resultat.
 export const DEFAULT_SEED = 7;

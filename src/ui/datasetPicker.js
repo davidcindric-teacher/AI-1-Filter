@@ -44,7 +44,7 @@ export function mountDatasetPicker(root, store) {
     rows: [
       ['Träningsdata (valt dataset)', '40 (20 spam, 20 vanliga)', 'Modellen lär sig av dessa texter.', 'Ja'],
       ['Valideringsdata', `${VALIDATION_TEXTS.length} (10 spam, 10 vanliga)`, 'Följa och jämföra träningen på texter modellen inte tränat på. Fast och kan inte ändras.', 'Nej, aldrig'],
-      ['Sluttest', `${FINAL_TEST_TEXTS.length} (10 spam, 10 vanliga)`, 'Ett sista test efter förbättringen (lektion 4). Låst, visas först när det körs.', 'Nej, aldrig'],
+      ['Sluttest', `${FINAL_TEST_TEXTS.length} (10 spam, 10 vanliga)`, 'Ett engångstest efter förbättringen (lektion 4). Visas först när det körs.', 'Nej, aldrig'],
     ],
     className: 'plain',
     rowHeaders: true,
@@ -56,7 +56,7 @@ export function mountDatasetPicker(root, store) {
     h('p', {}, 'Ett dataset är en samling texter med facit (spam eller vanligt). Alla texter är påhittade.'),
     fieldset,
     note,
-    h('details', { class: 'only-standard' }, h('summary', { text: 'Vilken data används till vad?' }), separation, h('p', { class: 'muted', text: 'Modellen tränar bara på träningsdata. Ett litet dataset ger osäkra slutsatser, och resultatet beror på vilka texter som ingår.' })),
+    h('details', { class: 'only-standard' }, h('summary', { text: 'Vilken data används till vad?' }), separation, h('p', { class: 'muted', text: 'Modellen tränar bara på träningsdata.' })),
     h('p', { class: 'only-simple muted', text: 'Modellen tränar bara på träningsdata. Valideringsdata och sluttestet används bara för att testa modellen.' }),
     demoRoot,
   );
@@ -104,9 +104,9 @@ export function mountDatasetPicker(root, store) {
       a: () => mk('a', DATASETS.a.name, DATASETS.a.description, DATASETS.a.texts, cardDetails(DATASETS.a.texts, vocabSize(DATASETS.a.texts))),
       b: () => mk('b', DATASETS.b.name, DATASETS.b.description, DATASETS.b.texts, cardDetails(DATASETS.b.texts, vocabSize(DATASETS.b.texts))),
       custom: () =>
-        mk('custom', 'Egen förbättrad version av B', 'dataset B där du bytt ut fem texter per klass', custom.rows, h('p', { class: custom.ok ? 'ok' : 'warn' }, custom.ok ? 'Giltig och redo att tränas. ' : 'Inte klar än: ', custom.ok ? '' : h('a', { href: '#egen-data', text: 'Gå till avsnittet Skapa egen förbättrad data' }))),
+        mk('custom', 'Egen förbättrad version av B', 'dataset B där du bytt ut fem texter per klass', custom.rows, h('p', { class: custom.ok ? 'ok' : 'warn' }, custom.ok ? 'Giltig och redo att tränas. ' : 'Inte klar än: ', custom.ok ? '' : h('a', { href: '#byt-texter', text: 'Gå till steget Byt ut texter' }))),
       mix: () =>
-        mk('mix', MIX_NAME, 'du väljer själv 20 + 20 texter ur A och B', mixRows(state.mixIds), h('p', { class: mixCheck.ok ? 'ok' : 'warn' }, mixCheck.ok ? 'Giltigt och redo att tränas.' : 'Inte klart än: ', mixCheck.ok ? '' : h('a', { href: '#extra', text: 'Välj texter i avsnittet Extra (Lektion 2)' }))),
+        mk('mix', MIX_NAME, 'du väljer själv 20 + 20 texter ur A och B', mixRows(state.mixIds), h('p', { class: mixCheck.ok ? 'ok' : 'warn' }, mixCheck.ok ? 'Giltigt och redo att tränas.' : 'Inte klart än: ', mixCheck.ok ? '' : h('a', { href: '#extra', text: 'Välj texter i steget Fördjupning' }))),
     };
     replace(cards, allowed.map((key) => all[key]()));
     const locked = state.mode !== 'single';
@@ -115,7 +115,7 @@ export function mountDatasetPicker(root, store) {
       ? {
           'compare-datasets': 'I Lektion 2 tränas dataset A och dataset B, båda med samma inställningar.',
           'compare-epochs': 'I Lektion 3 används dataset B.',
-          improve: 'I Lektion 4 används dataset B före och din förbättrade version efter. Skapa den i avsnittet Skapa egen förbättrad data.',
+          improve: 'I Lektion 4 används dataset B före och din förbättrade version efter. Skapa den i steget Byt ut texter.',
           'compare-abc': 'I den här laborationen tränas dataset A, dataset B och ditt eget mix C.',
           'compare-lr': 'I den här laborationen används dataset B.',
           'compare-hidden': 'I den här laborationen används dataset B.',
