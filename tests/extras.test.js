@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULTS, HIDDEN_COMPARISON, LR_COMPARISON } from '../src/config.js';
 import { DATASETS } from '../src/data/index.js';
-import { buildPlan, buildSeedImprovePlan } from '../src/experiments.js';
+import { buildPlan, buildSeedImprovePlan, datasetPhrase, MODE_DATASETS, shownDataset, usedDatasets } from '../src/experiments.js';
 import { MIX_POOL, mixCounts, mixRows, normalizeMixIds, validateMix } from '../src/mixData.js';
 import { analyzeErrors, bestEpochIndex, topInfluentialWords, wordInfluence } from '../src/analysis.js';
 import { trainModel } from '../src/ml/trainer.js';
@@ -171,5 +171,25 @@ describe('Analysmall och granskningschecklista', () => {
     const t = peerReviewText();
     expect(t).toContain(`${PEER_REVIEW_CHECKLIST.length}. `);
     expect(t).toContain('Svar/kommentar:');
+  });
+});
+
+describe('Dataset som visas i låsta laborationer', () => {
+  const B = DATASETS.b.texts;
+  const edits = {};
+  B.filter((r) => r.label === 'spam').slice(0, 5).forEach((r, i) => (edits[r.id] = `Extra spam nummer ${i}: klicka nu och vinn bonus`));
+  B.filter((r) => r.label === 'vanlig').slice(0, 5).forEach((r, i) => (edits[r.id] = `Vanlig text ${i}: vi ses vid bussen imorgon`));
+  it('MODE_DATASETS stämmer med de dataset buildPlan faktiskt tränar på', () => {
+    for (const [mode, keys] of Object.entries(MODE_DATASETS)) {
+      const plan = buildPlan({ mode, datasetKey: 'a', settings, edits, mixIds: goodMix() });
+      expect([...new Set(plan.map((p) => p.datasetKey))].sort(), mode).toEqual([...keys].sort());
+    }
+  });
+  it('visar elevens val i En träning och laborationens dataset annars', () => {
+    expect(usedDatasets({ mode: 'single', datasetKey: 'mix' })).toEqual(['mix']);
+    expect(shownDataset({ mode: 'compare-epochs', datasetKey: 'a' })).toBe('b');
+    expect(shownDataset({ mode: 'compare-datasets', datasetKey: 'a' })).toBe('a');
+    expect(shownDataset({ mode: 'improve', datasetKey: 'a' })).toBe('b');
+    expect(datasetPhrase('mix')).toBe('ditt eget mix C');
   });
 });

@@ -1,7 +1,6 @@
-import { DATASETS } from '../data/index.js';
 import { formatMetric } from '../metrics.js';
 import { metricsAtThreshold, summarizeSpread, sweepThresholds } from '../thresholdAnalysis.js';
-import { SEED_COUNT } from '../experiments.js';
+import { datasetPhrase, SEED_COUNT, shownDataset } from '../experiments.js';
 import { THRESHOLD } from '../config.js';
 import { CHALLENGES } from '../text/challenges.js';
 import { h, replace, table } from './dom.js';
@@ -29,7 +28,8 @@ function mountSeed(root, store) {
   );
   let lastRuns = null;
   const render = (state) => {
-    const ds = state.datasetKey === 'custom' ? 'din förbättrade version av B' : DATASETS[state.datasetKey].name;
+    // I låsta laborationer (lektion 2 och 4) körs experimentet på laborationens dataset, inte på ett dolt tidigare val.
+    const ds = datasetPhrase(shownDataset(state));
     const s = state.settings;
     info.textContent = `Använder ${ds} (steget Välj dataset), ${s.epochs} epoker och frö ${s.seed}, ${s.seed + 1}, … (steget Välj inställningar).`;
     btn.disabled = Boolean(state.training);

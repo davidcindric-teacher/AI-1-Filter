@@ -1,11 +1,15 @@
 import { CORE_MODES, DEFAULTS, EPOCH_COMPARISON, EXTENDED_MODES, HIDDEN_COMPARISON, LIMITS, LR_COMPARISON, MODES, THRESHOLD } from '../config.js';
-import { DATASETS } from '../data/index.js';
 import { buildVocabulary } from '../ml/vectorizer.js';
-import { validateCustomDataset } from '../customData.js';
-import { mixRows } from '../mixData.js';
+import { datasetPhrase, datasetRows, shownDataset } from '../experiments.js';
 import { LESSON_MODES } from '../lessons.js';
 import { EXPLAIN } from '../text/explanations.js';
 import { explained, h, replace } from './dom.js';
+
+const fmt = (v) => String(v).replace('.', ',');
+
+/** Värdena som en låst laboration faktiskt tränar med, t.ex. "5/30/100". */
+const COMPARISONS = { epochs: EPOCH_COMPARISON, learningRate: LR_COMPARISON, hiddenUnits: HIDDEN_COMPARISON };
+const shown = (key) => COMPARISONS[key].map(fmt).join('/');
 
 const parseNumber = (raw) => {
   const v = String(raw).trim().replace(',', '.');
@@ -104,29 +108,36 @@ export function mountSettings(root, store) {
     extendedBox.hidden = !EXTENDED_MODES.some((k) => visible.includes(k));
     modeSet.hidden = visible.length <= 1;
     for (const input of root.querySelectorAll('input[name="mode"]')) input.checked = input.value === state.mode;
-    for (const [key, f] of Object.entries(fields)) {
-      if (document.activeElement !== f.input) f.input.value = Number.isNaN(state.settings[key]) ? '' : String(state.settings[key]).replace('.', ',');
-    }
-    // Vissa laborationer jämför just en inställning. Då är den inställningen låst och visas i en förklaring.
+    // Vissa laborationer jämför just en inställning. Då är den inställningen låst, och fältet visar de värden
+    // som faktiskt tränas (t.ex. 5/30/100) i stället för elevens vanliga värde, som inte används.
     const locks = { epochs: state.mode === 'compare-epochs', learningRate: state.mode === 'compare-lr', hiddenUnits: state.mode === 'compare-hidden' };
-    for (const [key, f] of Object.entries(fields)) f.input.disabled = Boolean(locks[key]);
-    const lock = locks.epochs;
-    const lockText = { epochs: `I Lektion 3 är antal epoker fast: ${EPOCH_COMPARISON.join(', ')}.`, learningRate: `I den här laborationen är learning rate fast: ${LR_COMPARISON.map((v) => String(v).replace('.', ',')).join(', ')} (avancerade inställningar).`, hiddenUnits: `I den här laborationen är antal dolda noder fast: ${HIDDEN_COMPARISON.join(', ')} (avancerade inställningar).` };
+    for (const [key, f] of Object.entries(fields)) {
+      f.input.disabled = Boolean(locks[key]);
+      if (locks[key]) f.input.value = shown(key);
+      else if (document.activeElement !== f.input) f.input.value = Number.isNaN(state.settings[key]) ? '' : fmt(state.settings[key]);
+    }
+    const lockText = { epochs: `I Lektion 3 är antal epoker fast: ${EPOCH_COMPARISON.join(', ')}.`, learningRate: `I den här laborationen är learning rate fast: ${LR_COMPARISON.map(fmt).join(', ')} (avancerade inställningar).`, hiddenUnits: `I den här laborationen är antal dolda noder fast: ${HIDDEN_COMPARISON.join(', ')} (avancerade inställningar).` };
     const lockedKey = Object.keys(locks).find((k) => locks[k]);
     epochNote.hidden = !lockedKey;
     epochNote.textContent = lockedKey ? lockText[lockedKey] : '';
     if (EXTENDED_MODES.includes(state.mode)) extendedBox.open = true;
 
     const s = state.settings;
-    summary.textContent = `Nuvarande inställningar: slumpfrö ${s.seed}, ${lock ? EPOCH_COMPARISON.join('/') : s.epochs} epoker, learning rate ${String(s.learningRate).replace('.', ',')}, batchstorlek ${s.batchSize}, ${s.hiddenUnits} dolda noder.`;
+    const v = (key) => (locks[key] ? shown(key) : fmt(s[key]));
+    summary.textContent = `Nuvarande inställningar: slumpfrö ${s.seed}, ${v('epochs')} epoker, learning rate ${v('learningRate')}, batchstorlek ${s.batchSize}, ${v('hiddenUnits')} dolda noder.`;
 
     // Modellinformation
-    const rows = state.datasetKey === 'custom' ? validateCustomDataset(state.edits).rows : state.datasetKey === 'mix' ? mixRows(state.mixIds) : DATASETS[state.datasetKey].texts;
-    const vocab = buildVocabulary(rows.map((r) => r.text)).words.length;
-    const sig = `${vocab}|${s.hiddenUnits}|${state.datasetKey}`;
+    // I låsta laborationer beskrivs laborationens dataset (t.ex. B i lektion 3), inte ett dolt tidigare val.
+    const dsKey = shownDataset(state);
+    const vocab = buildVocabulary(datasetRows(dsKey, state).map((r) => r.text)).words.length;
+    const hiddenList = locks.hiddenUnits ? HIDDEN_COMPARISON : [s.hiddenUnits];
+    const sig = `${vocab}|${hiddenList.join(',')}|${dsKey}`;
     if (sig === lastInfo) return;
     lastInfo = sig;
-    const dsName = state.datasetKey === 'custom' ? 'din förbättrade version av B' : state.datasetKey === 'mix' ? 'ditt eget mix C' : DATASETS[state.datasetKey].name;
+    const dsName = datasetPhrase(dsKey);
+    const hiddenText = hiddenList.length > 1 ? `${hiddenList.join(', ')} noder (en modell per värde)` : `${s.hiddenUnits} noder`;
+    const weights = hiddenList.map((n) => vocab * n + n * 2 + 1);
+    const weightText = weights.length > 1 ? `Varje modell har vikter (${weights.join(', ')} tal)` : `Modellen har vikter (${weights[0]} tal)`;
     replace(
       info,
       h(
@@ -134,10 +145,10 @@ export function mountSettings(root, store) {
         { class: 'steps' },
         h('li', {}, h('strong', { text: 'Text blir siffror. ' }), 'Texten görs om till gemener och delas upp i ord (skiljetecken tas bort). Sedan skapas en lista med ett tal per ord i vokabulären: 1 om ordet finns i texten, annars 0. Ordföljden spelar ingen roll och ord som modellen inte sett vid träningen ignoreras. Prova själv i "Så blir din text till siffror" i steget Välj dataset.'),
         h('li', {}, h('strong', { text: 'Indatalager. ' }), `Lika många indata som ord i vokabulären. Med ${dsName} är vokabulären ${vocab} ord (bara ord från träningsdata).`),
-        h('li', {}, h('strong', { text: 'Dolt lager. ' }), `${s.hiddenUnits} noder som var och en räknar ihop de ord den reagerar på och sedan tillämpar ReLU (negativa tal blir 0).`),
+        h('li', {}, h('strong', { text: 'Dolt lager. ' }), `${hiddenText} som var och en räknar ihop de ord den reagerar på och sedan tillämpar ReLU (negativa tal blir 0).`),
         h('li', {}, h('strong', { text: 'Utdatalager. ' }), 'En nod med sigmoid som ger en sannolikhet för spam mellan 0 och 1.'),
         h('li', {}, h('strong', { text: 'Klassificering. ' }), `Om sannolikheten är minst ${String(THRESHOLD).replace('.', ',')} (tröskeln) svarar modellen spam, annars vanligt meddelande. Tröskeln ändras inte i laborationen.`),
-        h('li', {}, h('strong', { text: 'Vikter och träning. ' }), `Modellen har vikter (${vocab * s.hiddenUnits + s.hiddenUnits * 2 + 1} tal) som ändras under träningen. Efter varje liten grupp texter (batch) justeras vikterna med SGD så att felen blir mindre. Startvikterna bestäms av slumpfröet.`),
+        h('li', {}, h('strong', { text: 'Vikter och träning. ' }), `${weightText} som ändras under träningen. Efter varje liten grupp texter (batch) justeras vikterna med SGD så att felen blir mindre. Startvikterna bestäms av slumpfröet.`),
       ),
     );
   };

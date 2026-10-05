@@ -1,4 +1,4 @@
-import { buildPlan, buildSeedImprovePlan, buildSeedPlan } from '../experiments.js';
+import { buildPlan, buildSeedImprovePlan, buildSeedPlan, shownDataset } from '../experiments.js';
 import { trainModel } from '../ml/trainer.js';
 import { TrainingCancelled, UserError } from '../errors.js';
 import { appendHistory } from '../history.js';
@@ -101,7 +101,7 @@ export async function startSeedExperiment(store) {
   const state = store.get();
   let plan;
   try {
-    plan = buildSeedPlan({ datasetKey: state.datasetKey, settings: state.settings, edits: state.edits, mixIds: state.mixIds });
+    plan = buildSeedPlan({ datasetKey: shownDataset(state), settings: state.settings, edits: state.edits, mixIds: state.mixIds });
   } catch (err) {
     store.set({ error: describeError(err), notice: null });
     return;

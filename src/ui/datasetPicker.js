@@ -3,6 +3,7 @@ import { countPerClass } from '../dataChecks.js';
 import { validateCustomDataset } from '../customData.js';
 import { MIX_NAME, mixRows, validateMix } from '../mixData.js';
 import { allowedDatasets } from '../lessons.js';
+import { usedDatasets } from '../experiments.js';
 import { LABEL_NAMES } from '../config.js';
 import { buildVocabulary } from '../ml/vectorizer.js';
 import { h, replace, table } from './dom.js';
@@ -32,19 +33,6 @@ const cardDetails = (rows, vocabSize) =>
       table({ headers: ['Klass', 'Text'], rows: rows.map((r) => [LABEL_NAMES[r.label], r.text]) }),
     ),
   );
-
-/** Dataset som de låsta laborationerna faktiskt tränar på (se buildPlan i experiments.js). */
-const MODE_DATASETS = {
-  'compare-datasets': ['a', 'b'],
-  'compare-abc': ['a', 'b', 'mix'],
-  'compare-epochs': ['b'],
-  'compare-lr': ['b'],
-  'compare-hidden': ['b'],
-  improve: ['b', 'custom'],
-};
-
-/** Vilka kort som ska markeras. I låsta lägen visas laborationens dataset, annars elevens eget val. */
-const usedDatasets = (state) => MODE_DATASETS[state.mode] ?? [state.datasetKey];
 
 export function mountDatasetPicker(root, store) {
   const cards = h('div', { class: 'choice-grid' });

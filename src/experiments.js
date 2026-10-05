@@ -1,11 +1,39 @@
 import { DATASETS } from './data/index.js';
 import { EPOCH_COMPARISON, HIDDEN_COMPARISON, LR_COMPARISON, THRESHOLD } from './config.js';
-import { mixDataset, validateMix } from './mixData.js';
+import { mixDataset, mixRows, validateMix } from './mixData.js';
 import { applyEdits, validateCustomDataset } from './customData.js';
 import { UserError } from './errors.js';
 import { validateSettings } from './ml/trainer.js';
 
 export const SEED_COUNT = 5;
+
+/** Dataset som de låsta laborationerna faktiskt tränar på (måste stämma med buildPlan nedan). */
+export const MODE_DATASETS = Object.freeze({
+  'compare-datasets': ['a', 'b'],
+  'compare-abc': ['a', 'b', 'mix'],
+  'compare-epochs': ['b'],
+  'compare-lr': ['b'],
+  'compare-hidden': ['b'],
+  improve: ['b', 'custom'],
+});
+
+/** Dataset som laborationen använder. I låsta lägen laborationens dataset, annars elevens eget val. */
+export const usedDatasets = (state) => MODE_DATASETS[state.mode] ?? [state.datasetKey];
+
+/**
+ * Det dataset som visas när bara ett får plats (vokabulär, modellinformation, frö-experiment):
+ * elevens val om laborationen använder det, annars laborationens första dataset.
+ */
+export const shownDataset = (state) => {
+  const used = usedDatasets(state);
+  return used.includes(state.datasetKey) ? state.datasetKey : used[0];
+};
+
+/** Träningsraderna för ett dataset. Förbättrad B visas även när den inte är giltig än. */
+export const datasetRows = (key, { edits, mixIds }) => (key === 'custom' ? validateCustomDataset(edits).rows : key === 'mix' ? mixRows(mixIds) : DATASETS[key].texts);
+
+/** Datasetets namn i löptext, t.ex. "Med Dataset B är vokabulären ...". */
+export const datasetPhrase = (key) => (key === 'custom' ? 'din förbättrade version av B' : key === 'mix' ? 'ditt eget mix C' : DATASETS[key].name);
 
 /**
  * Före/efter över flera frön (lektion 4): för varje frö tränas dataset B före och efter förbättringen.
