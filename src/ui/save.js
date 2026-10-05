@@ -4,6 +4,7 @@ import { validateSettings } from '../ml/trainer.js';
 import { clearConvenience } from '../storage.js';
 import { UserError } from '../errors.js';
 import { allowedDatasets, lessonOfMode } from '../lessons.js';
+import { shownDataset } from '../experiments.js';
 import { copyToClipboard, downloadTextFile, h, replace } from './dom.js';
 import { startTraining } from './train.js';
 
@@ -22,7 +23,8 @@ export function resultBlockFromState(state, now = new Date()) {
 
 export function recoveryFromState(state, now = new Date()) {
   validateSettings({ ...state.settings, threshold: 0.5 });
-  return buildRecoveryText({ attemptName: state.attemptName, now, mode: state.mode, datasetKey: state.datasetKey, settings: state.settings, edits: state.edits, mixIds: state.mixIds, results: state.runs });
+  // I låsta laborationer sparas laborationens dataset (t.ex. B i lektion 3), inte ett dolt tidigare val.
+  return buildRecoveryText({ attemptName: state.attemptName, now, mode: state.mode, datasetKey: shownDataset(state), settings: state.settings, edits: state.edits, mixIds: state.mixIds, results: state.runs });
 }
 
 /**

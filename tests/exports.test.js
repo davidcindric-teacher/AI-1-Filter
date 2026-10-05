@@ -6,6 +6,8 @@ import { buildPlan } from '../src/experiments.js';
 import { trainModel } from '../src/ml/trainer.js';
 import { buildResultBlock, sampleEpochs } from '../src/report.js';
 import { buildRecoveryText, parseRecoveryText } from '../src/recovery.js';
+import { recoveryFromState } from '../src/ui/save.js';
+import { initialState } from '../src/state.js';
 
 const settings = { ...DEFAULTS, epochs: 6 };
 const NOW = new Date('2026-09-20T10:15:30Z');
@@ -112,6 +114,16 @@ describe('11. Import av återställningstext', () => {
     expect(res.ok).toBe(true);
     expect(res.state.edits).toEqual(edits);
     expect(JSON.parse(text).trainingTexts.map((t) => t.text)).toEqual(applyEdits(edits).map((t) => t.text));
+  });
+  it('sparar laborationens dataset i låsta lägen, inte ett dolt tidigare val', () => {
+    const saved = (patch) => JSON.parse(recoveryFromState({ ...initialState(), datasetKey: 'a', ...patch }, NOW)).dataset.key;
+    expect(saved({ mode: 'single' })).toBe('a');
+    expect(saved({ mode: 'compare-epochs' })).toBe('b');
+    expect(saved({ mode: 'improve' })).toBe('b');
+    expect(saved({ mode: 'compare-datasets' })).toBe('a');
+    const res = parseRecoveryText(recoveryFromState({ ...initialState(), mode: 'compare-epochs', datasetKey: 'a' }, NOW));
+    expect(res.ok).toBe(true);
+    expect(res.state.datasetKey).toBe('b');
   });
   it('återställd data ger exakt samma träningsresultat', async () => {
     const edits = goodEdits();

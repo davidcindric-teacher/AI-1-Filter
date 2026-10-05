@@ -2,20 +2,27 @@ import { buildPlan, buildSeedImprovePlan, buildSeedPlan, shownDataset } from '..
 import { trainModel } from '../ml/trainer.js';
 import { TrainingCancelled, UserError } from '../errors.js';
 import { appendHistory } from '../history.js';
+import { EPOCH_COMPARISON, HIDDEN_COMPARISON, LR_COMPARISON } from '../config.js';
 import { announce, h } from './dom.js';
 import { goToSection } from './nav.js';
 
 let runCounter = 0;
 let cancelRequested = false;
 
+/** Svensk uppräkning: "5, 30 och 100". */
+const list = (values) => {
+  const v = values.map((x) => String(x).replace('.', ','));
+  return `${v.slice(0, -1).join(', ')} och ${v.at(-1)}`;
+};
+
 const MODE_TEXT = {
   single: (s) => `Tränar 1 ny modell (${s.epochs} epoker).`,
   'compare-datasets': (s) => `Tränar 2 nya modeller: dataset A och dataset B (${s.epochs} epoker vardera).`,
-  'compare-epochs': () => 'Tränar 3 nya modeller på dataset B: 5, 30 och 100 epoker.',
+  'compare-epochs': () => `Tränar ${EPOCH_COMPARISON.length} nya modeller på dataset B: ${list(EPOCH_COMPARISON)} epoker.`,
   improve: (s) => `Tränar 2 nya modeller: dataset B före och efter din förbättring (${s.epochs} epoker vardera).`,
   'compare-abc': (s) => `Tränar 3 nya modeller: dataset A, dataset B och ditt eget mix C (${s.epochs} epoker vardera).`,
-  'compare-lr': (s) => `Tränar 3 nya modeller på dataset B med learning rate 0,01, 0,1 och 0,5 (${s.epochs} epoker vardera).`,
-  'compare-hidden': (s) => `Tränar 3 nya modeller på dataset B med 2, 8 och 32 dolda noder (${s.epochs} epoker vardera).`,
+  'compare-lr': (s) => `Tränar ${LR_COMPARISON.length} nya modeller på dataset B med learning rate ${list(LR_COMPARISON)} (${s.epochs} epoker vardera).`,
+  'compare-hidden': (s) => `Tränar ${HIDDEN_COMPARISON.length} nya modeller på dataset B med ${list(HIDDEN_COMPARISON)} dolda noder (${s.epochs} epoker vardera).`,
 };
 
 /** Översätter tekniska fel till begripliga svenska meddelanden. */
