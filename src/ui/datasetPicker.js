@@ -33,6 +33,19 @@ const cardDetails = (rows, vocabSize) =>
     ),
   );
 
+/** Dataset som de låsta laborationerna faktiskt tränar på (se buildPlan i experiments.js). */
+const MODE_DATASETS = {
+  'compare-datasets': ['a', 'b'],
+  'compare-abc': ['a', 'b', 'mix'],
+  'compare-epochs': ['b'],
+  'compare-lr': ['b'],
+  'compare-hidden': ['b'],
+  improve: ['b', 'custom'],
+};
+
+/** Vilka kort som ska markeras. I låsta lägen visas laborationens dataset, annars elevens eget val. */
+const usedDatasets = (state) => MODE_DATASETS[state.mode] ?? [state.datasetKey];
+
 export function mountDatasetPicker(root, store) {
   const cards = h('div', { class: 'choice-grid' });
   const note = h('p', { class: 'muted', id: 'dataset-mode-note' });
@@ -63,10 +76,11 @@ export function mountDatasetPicker(root, store) {
   mountModelDemo(demoRoot, store);
 
   let lastKey = null;
-  const syncSelection = (key) => {
+  // En radioknapp kan bara visa ett val. Används flera dataset markeras korten men ingen knapp.
+  const syncSelection = (used) => {
     for (const input of cards.querySelectorAll('input[name="dataset"]')) {
-      input.checked = input.value === key;
-      input.closest('.choice').classList.toggle('is-selected', input.value === key);
+      input.checked = used.length === 1 && used[0] === input.value;
+      input.closest('.choice').classList.toggle('is-selected', used.includes(input.value));
     }
   };
   const render = (state) => {
@@ -74,7 +88,7 @@ export function mountDatasetPicker(root, store) {
     // så att tangentbordsfokus på radioknappen inte försvinner.
     const sig = `${state.lesson}|${state.mode}|${JSON.stringify(state.edits)}|${state.mixIds.join(',')}`;
     if (sig === lastKey) {
-      syncSelection(state.datasetKey);
+      syncSelection(usedDatasets(state));
       return;
     }
     lastKey = sig;
@@ -87,12 +101,11 @@ export function mountDatasetPicker(root, store) {
         name: 'dataset',
         id: `ds-${key}`,
         value: key,
-        checked: state.datasetKey === key,
         onchange: () => store.set({ datasetKey: key }),
       });
       return h(
         'div',
-        { class: `choice${state.datasetKey === key ? ' is-selected' : ''}` },
+        { class: 'choice' },
         h('label', { for: `ds-${key}`, class: 'choice-label' }, input, h('span', { class: 'choice-title', text: name })),
         h('p', { class: 'muted', text: `${c.spam} spam · ${c.vanlig} vanliga · ${description}` }),
         extra,
@@ -109,6 +122,7 @@ export function mountDatasetPicker(root, store) {
         mk('mix', MIX_NAME, 'du väljer själv 20 + 20 texter ur A och B', mixRows(state.mixIds), h('p', { class: mixCheck.ok ? 'ok' : 'warn' }, mixCheck.ok ? 'Giltigt och redo att tränas.' : 'Inte klart än: ', mixCheck.ok ? '' : h('a', { href: '#extra', text: 'Välj texter i steget Fördjupning' }))),
     };
     replace(cards, allowed.map((key) => all[key]()));
+    syncSelection(usedDatasets(state));
     const locked = state.mode !== 'single';
     fieldset.disabled = locked;
     note.textContent = locked
