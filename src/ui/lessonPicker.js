@@ -101,8 +101,8 @@ function mountGuide(root, block, store, { onNavigate, summary = null }) {
   };
 
   return (state) => {
-    block.hidden = state.lesson === 'all';
-    if (state.lesson === 'all') return;
+    block.hidden = state.lesson === 'all' || state.lesson === 5;
+    if (block.hidden) return;
     const steps = guideSteps(state.lesson, state);
     const nextSig = `${state.lesson}|${steps.map((s) => s.id).join(',')}`;
     if (nextSig !== sig) {

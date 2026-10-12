@@ -6,7 +6,7 @@ export const LESSONS = Object.freeze({
   2: { title: 'Träningsdata', goal: 'Jämför dataset A och B: samma inställningar men olika träningsdata.' },
   3: { title: 'Antal epoker', goal: 'Träna dataset B med 5, 30 och 100 epoker och undersök kurvorna.' },
   4: { title: 'Förbättring och sluttest', goal: 'Förbättra dataset B, jämför före och efter och kör sluttestet en gång.' },
-  5: { title: 'Individuell analys', goal: 'Analysera dina resultat i ditt eget arbetsdokument. Appen ger tabeller och en analysmall.' },
+  5: { title: 'Individuell analys', goal: 'Svara på texten i ditt arbetsdokument.' },
 });
 export const LESSON_KEYS = Object.freeze([1, 2, 3, 4, 5]);
 
@@ -92,12 +92,8 @@ export function guideSteps(lesson, s) {
         copyStep,
       ];
     default:
-      return [
-        auto('l5-template', '#analys', 'Kopiera analysmallen (steget Analys)', s.copied.analysis),
-        manual('l5-write', '#analys', 'Skriv din analys i ditt dokument. Varje påstående ska stödjas av dina egna siffror'),
-        manual('l5-review', '#analys', 'Byt analys med en kamrat och granska med checklistan'),
-        auto('l5-copy', '#spara', 'Kopiera resultatblock och återställningstext', copied),
-      ];
+      // Lektion 5 görs helt i arbetsdokumentet.
+      return [];
   }
 }
 

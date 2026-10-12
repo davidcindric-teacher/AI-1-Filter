@@ -6,7 +6,6 @@ import { analyzeErrors, bestEpochIndex } from '../analysis.js';
 import { legend, lineChart } from './charts.js';
 import { explained, h, replace, table } from './dom.js';
 import { goToSection } from './nav.js';
-import { mountRestore } from './save.js';
 
 const pct = (v) => formatMetric(v);
 
@@ -318,25 +317,11 @@ export function cautionPoints(lesson) {
 
 export function mountResults(root, store, { onCopy }) {
   const body = h('div');
-  // Lektion 5: resultaten finns bara kvar tills sidan laddas om, så eleven läser först in en återställningstext
-  // från en tidigare lektion. Rutan byggs en gång (inte i render) så att meddelandet efter inläsningen finns kvar.
-  const restoreRoot = h('div');
-  const restoreHeading = h('h3');
-  const restoreBox = h(
-    'div',
-    { class: 'callout restore-box' },
-    restoreHeading,
-    h('p', {}, 'Resultaten från tidigare lektioner finns inte kvar i appen. Klistra in återställningstexten från ditt arbetsdokument och klicka sedan på Träna nu. Du får exakt samma resultat som förra gången. Upprepa för varje lektion du vill ha med i analysen. Alla inlästa lektioner tas med i analysmallen.'),
-    restoreRoot,
-  );
-  mountRestore(restoreRoot, store, { idPrefix: 'result-', keepLesson: true });
-  root.append(restoreBox, body);
+  root.append(body);
   let last = [];
   let lastRunsForTabs = null;
   const tabState = { index: 0 };
   const render = (state) => {
-    restoreBox.hidden = state.lesson !== 5;
-    restoreHeading.textContent = state.analysisRuns.length ? 'Läs in fler lektioner' : 'Börja här: läs in dina resultat';
     const sig = [state.runs, state.lesson, state.history, state.runsMode, state.mode];
     if (sig.every((v, i) => v === last[i])) return;
     last = sig;
@@ -349,7 +334,7 @@ export function mountResults(root, store, { onCopy }) {
     const retrain = improveFlow ? '#fore-efter' : '#trana';
     if (runs.length === 0) {
       const howTo = state.mode === 'improve' ? 'Klicka på "Träna före och efter" i steget Träna före och efter.' : 'Klicka på "Träna från början" i steget Träna modellen.';
-      replace(body, state.lesson === 5 ? null : h('p', { class: 'muted', text: `Inga resultat ännu. ${howTo}` }));
+      replace(body, h('p', { class: 'muted', text: `Inga resultat ännu. ${howTo}` }));
       return;
     }
     replace(
@@ -361,7 +346,7 @@ export function mountResults(root, store, { onCopy }) {
         // I lektion 4 leder knapparna vidare i förbättringsflödet i stället för tillbaka till början.
         improveFlow ? h('a', { class: 'btn btn-secondary btn-link', href: '#sluttest', text: 'Gå till sluttestet', onclick: (e) => { e.preventDefault(); goToSection('#sluttest'); } }) : null,
         [1, 2, 'all'].includes(state.lesson) && !improveFlow ? h('a', { class: 'btn btn-secondary btn-link', href: '#testa', text: 'Testa egen text', onclick: (e) => { e.preventDefault(); goToSection('#testa'); } }) : null,
-        state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: retrain, text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection(retrain); } }),
+        h('a', { class: 'btn btn-secondary btn-link', href: retrain, text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection(retrain); } }),
       ),
       runs.length > 1 ? comparison(runs, state.runsMode) : null,
       runsView(runs, state.lesson, tabState),

@@ -142,7 +142,7 @@ function mountThreshold(root, store) {
 /** Utmaningar: bara den valda lektionens ruta visas (alla vid "Alla"). */
 function mountChallenges(root, store) {
   const KEY = { 1: 'single', 2: 'compare-datasets', 3: 'compare-epochs', 4: 'improve' };
-  const boxes = CHALLENGES.filter((c) => c.key !== 'analysis').map((c) => ({ key: c.key, el: h('details', { class: 'challenge', open: true }, h('summary', { text: c.title }), h('ol', {}, c.tasks.map((t) => h('li', { text: t })))) }));
+  const boxes = CHALLENGES.map((c) => ({ key: c.key, el: h('details', { class: 'challenge', open: true }, h('summary', { text: c.title }), h('ol', {}, c.tasks.map((t) => h('li', { text: t })))) }));
   root.append(
     h('h3', { text: 'Utmaningar' }),
     h('p', {}, 'Uppgifter för dig som blir klar tidigt. Skriv svaren i ditt eget arbetsdokument. Appen bedömer ingenting.'),

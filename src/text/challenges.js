@@ -47,15 +47,4 @@ export const CHALLENGES = [
       'Förklara varför en förbättring på valideringsdata inte behöver synas på sluttestet.',
     ],
   },
-  {
-    key: 'analysis',
-    title: 'Lektion 5: Individuell analys',
-    tasks: [
-      'Byt analys med en kamrat och granska med checklistan. Vilka påståenden saknar stöd i siffror?',
-      'Sammanställ dina körningar i en tabell (dataset, epoker, frö, accuracy, precision, recall, F1) med hjälp av dina resultatblock.',
-      'Skriv en slutsats där varje påstående stöds av ett tal från dina egna körningar, och ange minst en osäkerhet.',
-      'Välj ett fel som modellen gör och förklara det med ord som modellen kände igen eller inte kände igen.',
-      'Föreslå en konkret förändring (data, epoker eller tröskel) som du inte hunnit testa, och förutsäg vad som händer.',
-    ],
-  },
 ];

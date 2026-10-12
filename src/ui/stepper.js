@@ -16,7 +16,6 @@ const PAGES = [
   ['byt-texter', 'Byt ut texter'],
   ['fore-efter', 'Träna före och efter'],
   ['sluttest', 'Sluttest'],
-  ['analys', 'Analys'],
   ['spara', 'Spara och återställ'],
   ['extra', 'Fördjupning'],
 ];
@@ -121,6 +120,8 @@ export function mountStepper(store) {
     const shown = (p) => isVisibleIn(p.section.dataset.lessons, state.lesson);
     const order = LESSON_ORDER[state.lesson];
     const visible = order ? order.map((id) => all.find((p) => p.id === id)).filter(shown) : all.filter(shown);
+    // Lektion 5 har bara introduktionen (instruktionen). Då behövs ingen stegrad.
+    on = on && visible.length > 1;
     const nextSig = `${state.screen}|${state.lesson}|${visible.map((p) => p.id).join(',')}`;
     if (nextSig === sig) return;
     sig = nextSig;

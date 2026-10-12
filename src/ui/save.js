@@ -27,12 +27,9 @@ export function recoveryFromState(state, now = new Date()) {
   return buildRecoveryText({ attemptName: state.attemptName, now, mode: state.mode, datasetKey: shownDataset(state), settings: state.settings, edits: state.edits, mixIds: state.mixIds, results: state.runs });
 }
 
-/**
- * Formulär för att läsa in en återställningstext. Används i steget Spara och återställ och överst i Resultat
- * i lektion 5. keepLesson: stanna i nuvarande lektion (lektion 5 analyserar resultat från lektion 1–4).
- */
-export function mountRestore(root, store, { idPrefix = '', keepLesson = false } = {}) {
-  const importBox = h('textarea', { id: `${idPrefix}import-text`, rows: '8', placeholder: 'Klistra in återställningstexten här (börjar med {)' });
+/** Formulär för att läsa in en återställningstext (steget Spara och återställ). */
+function mountRestore(root, store) {
+  const importBox = h('textarea', { id: 'import-text', rows: '8', placeholder: 'Klistra in återställningstexten här (börjar med {)' });
   const importMsg = h('div', { class: 'import-msg', role: 'alert' });
 
   const load = () => {
@@ -42,7 +39,7 @@ export function mountRestore(root, store, { idPrefix = '', keepLesson = false } 
       return;
     }
     const s = res.state;
-    store.set({ attemptName: s.attemptName || store.get().attemptName, mode: s.mode, lesson: keepLesson ? store.get().lesson : allowedDatasets(lessonOfMode(s.mode)).includes(s.datasetKey) ? lessonOfMode(s.mode) : 'all', datasetKey: s.datasetKey, settings: s.settings, edits: s.edits, mixIds: s.mixIds, runs: [], runsMode: null, finalTest: null, seedExperiment: null, seedImprove: null, thresholdExp: null, error: null, notice: null });
+    store.set({ attemptName: s.attemptName || store.get().attemptName, mode: s.mode, lesson: allowedDatasets(lessonOfMode(s.mode)).includes(s.datasetKey) ? lessonOfMode(s.mode) : 'all', datasetKey: s.datasetKey, settings: s.settings, edits: s.edits, mixIds: s.mixIds, runs: [], runsMode: null, finalTest: null, seedExperiment: null, seedImprove: null, thresholdExp: null, error: null, notice: null });
     replace(
       importMsg,
       h(

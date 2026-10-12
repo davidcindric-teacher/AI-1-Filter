@@ -6,7 +6,6 @@ import { MIX_POOL, mixCounts, mixRows, normalizeMixIds, validateMix } from '../s
 import { analyzeErrors, bestEpochIndex, topInfluentialWords, wordInfluence } from '../src/analysis.js';
 import { trainModel } from '../src/ml/trainer.js';
 import { buildResultBlock, formatDiff, summarizeImprovement } from '../src/report.js';
-import { buildAnalysisTemplate, peerReviewText, PEER_REVIEW_CHECKLIST } from '../src/analysisTemplate.js';
 import { buildRecoveryText, parseRecoveryText } from '../src/recovery.js';
 import { UserError } from '../src/errors.js';
 import { normalizeText } from '../src/ml/tokenizer.js';
@@ -151,26 +150,6 @@ describe('Före/efter över flera frön', () => {
     const block = buildResultBlock({ attemptName: 'x', runs: [], seedImprove: { pairs } });
     expect(block).toContain('Före/efter över flera frön');
     expect(block).toMatch(/Efter var bättre i \d av 2 frön/);
-  });
-});
-
-describe('Analysmall och granskningschecklista', () => {
-  it('fyller i elevens siffror och lämnar tolkningarna tomma', async () => {
-    const [spec] = buildPlan({ mode: 'single', datasetKey: 'a', settings: { ...settings, epochs: 3 }, edits: {} });
-    const run = await trainModel(spec);
-    const t = buildAnalysisTemplate({ attemptName: 'Analys 1', now: new Date('2026-09-20T10:00:00Z'), runs: [run] });
-    for (const h of ['1. Frågeställning och hypotes', '2. Metod', '3. Resultat', '4. Förklaring', '5. Osäkerhet och begränsningar', '6. Slutsats', '7. Förbättringsförslag', 'Försöksnamn: Analys 1']) expect(t).toContain(h);
-    expect(t).toContain(`slumpfrö ${run.settings.seed}`);
-    expect(t).toContain(`${run.validation.metrics.fp} | ${run.validation.metrics.fn}`);
-    expect(t).not.toMatch(/undefined|NaN/);
-  });
-  it('fungerar utan körningar', () => {
-    expect(buildAnalysisTemplate({ attemptName: '', runs: [] })).toContain('Inga körningar finns');
-  });
-  it('checklistan har numrerade frågor', () => {
-    const t = peerReviewText();
-    expect(t).toContain(`${PEER_REVIEW_CHECKLIST.length}. `);
-    expect(t).toContain('Svar/kommentar:');
   });
 });
 

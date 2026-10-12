@@ -29,9 +29,8 @@ export const initialState = () => ({
   edits: {}, // { id: ny text } för förbättrad dataset B
   mixIds: [], // val av texter till dataset C (id från A och B)
   runs: [], // färdiga körningar (resultat) från senaste träningen
-  analysisRuns: [], // lektion 5: körningar från alla inlästa lektioner, märkta med lektion (bara i minnet)
   history: [], // kort sammanfattning av alla körningar i sessionen (bara i minnet)
-  copied: { result: false, recovery: false, analysis: false }, // har eleven kopierat efter senaste körningen?
+  copied: { result: false, recovery: false }, // har eleven kopierat efter senaste körningen?
   manualDone: {}, // steg i lektionsguiden som eleven själv bockat av
   runsMode: null,
   testLog: [], // elevens egna testtexter (påverkar aldrig modellen)

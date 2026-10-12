@@ -3,7 +3,6 @@ import { trainModel } from '../ml/trainer.js';
 import { TrainingCancelled, UserError } from '../errors.js';
 import { appendHistory } from '../history.js';
 import { EPOCH_COMPARISON, HIDDEN_COMPARISON, LR_COMPARISON } from '../config.js';
-import { lessonOfMode } from '../lessons.js';
 import { announce, h } from './dom.js';
 import { goToSection } from './nav.js';
 
@@ -87,15 +86,9 @@ export async function startTraining(store) {
     return;
   }
   await executePlan(store, plan, (results) => {
-    // Lektion 5 samlar körningar från flera inlästa lektioner till analysmallen. En lektion som läses in igen ersätts.
-    const lesson = lessonOfMode(state.mode);
-    const analysisRuns = state.lesson === 5
-      ? [...store.get().analysisRuns.filter((r) => r.lesson !== lesson), ...results.map((r) => ({ ...r, lesson, label: `Lektion ${lesson}: ${r.label}` }))].sort((a, b) => a.lesson - b.lesson)
-      : store.get().analysisRuns;
     store.set({
       training: null,
       runs: results,
-      analysisRuns,
       runsMode: state.mode,
       history: appendHistory(store.get().history, results),
       // Nya resultat måste kopieras på nytt (lektionsguiden bockar av det).

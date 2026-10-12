@@ -15,7 +15,6 @@ import { mountEditor } from './ui/editor.js';
 import { mountFinalTest } from './ui/finalTest.js';
 import { mountSave } from './ui/save.js';
 import { mountExtra } from './ui/extra.js';
-import { mountAnalysis } from './ui/extraAnalysis.js';
 import { mountLessons } from './ui/lessonPicker.js';
 import { mountStepper } from './ui/stepper.js';
 
@@ -161,7 +160,6 @@ function start() {
   mountEditor($('#mount-editor'), $('#mount-improve-train'), store);
   mountFinalTest($('#mount-final'), store);
   mountExtra($('#mount-extra'), store);
-  mountAnalysis($('#mount-analysis'), store);
   mountLessons(store, { closeMenu: menu.close });
   mountStepper(store);
 

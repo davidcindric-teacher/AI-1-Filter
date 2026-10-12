@@ -56,9 +56,9 @@ describe('Lektionsguide', () => {
     // samma text flera gånger räknas som en
     expect(step({ ...trained, testLog: Array(6).fill(log[0]) }, 'l1-test').done).toBe(false);
     // kopiering kräver både resultatblock och återställningstext, och att det finns körningar
-    expect(step({ ...trained, copied: { result: true, recovery: false, analysis: false } }, 'l1-copy').done).toBe(false);
-    expect(step({ ...trained, copied: { result: true, recovery: true, analysis: false } }, 'l1-copy').done).toBe(true);
-    expect(step({ ...s, copied: { result: true, recovery: true, analysis: false } }, 'l1-copy').done).toBe(false);
+    expect(step({ ...trained, copied: { result: true, recovery: false } }, 'l1-copy').done).toBe(false);
+    expect(step({ ...trained, copied: { result: true, recovery: true } }, 'l1-copy').done).toBe(true);
+    expect(step({ ...s, copied: { result: true, recovery: true } }, 'l1-copy').done).toBe(false);
   });
   it('manuella steg bockas bara av eleven', () => {
     const s = initialState();
@@ -80,7 +80,7 @@ describe('Lektionsguide', () => {
     B.filter((r) => r.label === 'vanlig').slice(0, 5).forEach((r, i) => (edits[r.id] = `Ny vanlig ${i}: vi ses vid bussen`));
     expect(guideSteps(4, { ...s, edits })[0].done).toBe(true);
     expect(guideSteps(4, { ...s, finalTestRuns: 1 }).find((x) => x.id === 'l4-final').done).toBe(true);
-    expect(guideSteps(5, { ...s, copied: { result: false, recovery: false, analysis: true } })[0].done).toBe(true);
+    expect(guideSteps(5, s)).toEqual([]);
     expect(guideSteps('all', s)).toEqual([]);
   });
   it('progress räknar klara steg', () => {
