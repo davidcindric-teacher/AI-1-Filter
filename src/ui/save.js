@@ -126,7 +126,7 @@ export function mountSave(root, store) {
       h('button', { type: 'button', class: 'btn btn-secondary', text: 'Ladda ner återställning (.json)', onclick: download }),
     ),
     status,
-    h('p', { class: 'muted only-standard', text: 'Resultatblocket är vanlig text som du kan klistra in i ett dokument. Återställningstexten innehåller dina träningstexter, inställningar, slumpfrö och appversion. Med den kan du återskapa körningen senare. Filen du kan ladda ner ersätter inte att kopiera texten till arbetsdokumentet.' }),
+    h('p', { class: 'muted', text: 'Resultatblocket är vanlig text som du kan klistra in i ett dokument. Återställningstexten innehåller dina träningstexter, inställningar, slumpfrö och appversion. Med den kan du återskapa körningen senare. Filen du kan ladda ner ersätter inte att kopiera texten till arbetsdokumentet.' }),
     h('details', {}, h('summary', { text: 'Visa resultatblocket (kopiera manuellt om knappen inte fungerar)' }), resultPreview),
     h('details', {}, h('summary', { text: 'Visa återställningstexten (kopiera manuellt om knappen inte fungerar)' }), recoveryPreview),
     // Det viktiga i steget är att kopiera. Återställning och webbläsarens lagring behövs sällan och är hopfällda.
@@ -134,10 +134,10 @@ export function mountSave(root, store) {
       'details',
       { class: 'advanced save-more' },
       h('summary', { text: 'Återställ från en tidigare återställningstext' }),
-      h('p', { class: 'only-standard' }, 'Klistra in en tidigare återställningstext och läs in den. Appen kontrollerar texten först. Nuvarande resultat rensas och du tränar om från början. Med samma slumpfrö, data och inställningar får du samma resultat igen.'),
+      h('p', {}, 'Klistra in en tidigare återställningstext och läs in den. Appen kontrollerar texten först. Nuvarande resultat rensas och du tränar om från början. Med samma slumpfrö, data och inställningar får du samma resultat igen.'),
       restoreRoot,
     ),
-    h('details', { class: 'advanced save-more only-standard' }, h('summary', { text: 'Det här sparas i webbläsaren' }), h('p', { class: 'muted' }, 'Inställningar och dina ändringar av datan kan sparas i den här webbläsaren som en extra bekvämlighet. Det kan försvinna när som helst, till exempel om webbläsaren rensar data eller om du byter enhet. Förlita dig inte på det. ', h('button', { type: 'button', class: 'btn btn-small btn-secondary', text: 'Rensa sparat i webbläsaren', onclick: () => { clearConvenience(); say('Det som sparats i webbläsaren är rensat.'); } }))),
+    h('details', { class: 'advanced save-more' }, h('summary', { text: 'Det här sparas i webbläsaren' }), h('p', { class: 'muted' }, 'Inställningar och dina ändringar av datan kan sparas i den här webbläsaren som en extra bekvämlighet. Det kan försvinna när som helst, till exempel om webbläsaren rensar data eller om du byter enhet. Förlita dig inte på det. ', h('button', { type: 'button', class: 'btn btn-small btn-secondary', text: 'Rensa sparat i webbläsaren', onclick: () => { clearConvenience(); say('Det som sparats i webbläsaren är rensat.'); } }))),
   );
   return { copy };
 }

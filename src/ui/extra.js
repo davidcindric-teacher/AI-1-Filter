@@ -9,7 +9,6 @@ import { runDisplayName } from './tester.js';
 import { mountWords } from './extraWords.js';
 import { mountMix } from './extraMix.js';
 import { mountImproveSeeds } from './extraImprove.js';
-import { mountAnalysis } from './extraAnalysis.js';
 import { startSeedExperiment } from './train.js';
 
 const pct = formatMetric;
@@ -142,8 +141,8 @@ function mountThreshold(root, store) {
 
 /** Utmaningar: bara den valda lektionens ruta visas (alla vid "Alla"). */
 function mountChallenges(root, store) {
-  const KEY = { 1: 'single', 2: 'compare-datasets', 3: 'compare-epochs', 4: 'improve', 5: 'analysis' };
-  const boxes = CHALLENGES.map((c) => ({ key: c.key, el: h('details', { class: 'challenge', open: true }, h('summary', { text: c.title }), h('ol', {}, c.tasks.map((t) => h('li', { text: t })))) }));
+  const KEY = { 1: 'single', 2: 'compare-datasets', 3: 'compare-epochs', 4: 'improve' };
+  const boxes = CHALLENGES.filter((c) => c.key !== 'analysis').map((c) => ({ key: c.key, el: h('details', { class: 'challenge', open: true }, h('summary', { text: c.title }), h('ol', {}, c.tasks.map((t) => h('li', { text: t })))) }));
   root.append(
     h('h3', { text: 'Utmaningar' }),
     h('p', {}, 'Uppgifter för dig som blir klar tidigt. Skriv svaren i ditt eget arbetsdokument. Appen bedömer ingenting.'),
@@ -170,8 +169,7 @@ export function mountExtra(root, store) {
   const mix = part('2');
   const epochsInfo = part('3');
   const improve = part('4');
-  const analysis = part('5');
-  const ch = part('1 2 3 4 5');
+  const ch = part('1 2 3 4');
   root.append(
     h('p', {}, 'Fördjupning för dig som blir klar tidigt. Ingenting här ändrar dina vanliga resultat i steget Resultat. Frö- och tröskelexperiment tas med i resultatblocket.'),
     seed,
@@ -180,7 +178,6 @@ export function mountExtra(root, store) {
     mix,
     epochsInfo,
     improve,
-    analysis,
     ch,
   );
   mountSeed(seed, store);
@@ -192,6 +189,5 @@ export function mountExtra(root, store) {
     h('p', {}, 'I resultaten är epoken med högst validation accuracy markerad i diagrammet. I steget ', h('a', { href: '#installningar', text: 'Välj inställningar' }), ' finns dessutom utökade laborationer där du jämför learning rate (0,01, 0,1 och 0,5) eller antal dolda noder (2, 8 och 32). Välj dem under "Utökade laborationer".'),
   );
   mountImproveSeeds(improve, store);
-  mountAnalysis(analysis, store);
   mountChallenges(ch, store);
 }

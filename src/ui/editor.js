@@ -70,7 +70,7 @@ export function mountEditor(root, trainRoot, store) {
   root.append(
     h('p', {}, 'Utgå från dataset B och byt ut exakt ', h('strong', { text: `${SWAP_COUNT} texter i varje klass` }), ' mot egna påhittade texter som du tror gör modellen bättre. Klasserna ligger fast: en spamtext byts mot en spamtext och en vanlig text mot en vanlig text. Datamängden ska fortfarande ha exakt ', String(CLASS_SIZE), ' spamtexter och ', String(CLASS_SIZE), ' vanliga texter.'),
     h('p', { class: 'callout' }, h('strong', { text: 'Tips: ' }), 'Vilka texter klassificerade modellen fel med dataset B i lektion 2 och 3? Titta i dina resultatblock på de felklassificerade texterna. Vilka ord saknades i träningsdatan? Byt ut texter som liknar varandra mot texter med sådana ord.'),
-    h('p', { class: 'muted only-standard', text: 'Texter som är identiska med valideringsdata eller sluttestet, tomma texter och dubbletter nekas.' }),
+    h('p', { class: 'muted', text: 'Texter som är identiska med valideringsdata eller sluttestet, tomma texter och dubbletter nekas.' }),
     summary,
     problems,
     changesList,
@@ -81,7 +81,7 @@ export function mountEditor(root, trainRoot, store) {
     h('p', {}, 'Nu tränas två modeller: en på dataset B (före) och en på din förbättrade version (efter). Resultaten visas sida vid sida i steget Resultat.'),
     trainStatus,
     h('div', { class: 'button-row' }, trainBtn),
-    h('p', { class: 'muted only-standard', text: 'Båda modellerna tränas från samma startläge, med samma slumpfrö, antal epoker och valideringsdata som du valt i steget Välj inställningar.' }),
+    h('p', { class: 'muted', text: 'Båda modellerna tränas från samma startläge, med samma slumpfrö, antal epoker och valideringsdata som du valt i steget Välj inställningar.' }),
   );
 
   // Uppdaterar varje rads utseende (öppen/stängd, badge, förhandsvisning). Körs alltid, även när "expanded"

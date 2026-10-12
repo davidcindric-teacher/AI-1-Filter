@@ -18,7 +18,6 @@ export function createStore(initial) {
 }
 
 export const initialState = () => ({
-  view: 'standard', // 'standard' | 'simple' (bara presentation, påverkar inte modell eller resultat)
   lesson: 1, // 1–5 eller 'all' (visar hela appen). Styr vilka avsnitt och laborationer som visas.
   screen: 'home', // 'home' (startskärm med lektionsval) | 'lesson' (den valda lektionen). Sparas inte.
   allUnlocked: false, // "Visa alla avsnitt" upplåst (bara denna session)
@@ -30,6 +29,7 @@ export const initialState = () => ({
   edits: {}, // { id: ny text } för förbättrad dataset B
   mixIds: [], // val av texter till dataset C (id från A och B)
   runs: [], // färdiga körningar (resultat) från senaste träningen
+  analysisRuns: [], // lektion 5: körningar från alla inlästa lektioner, märkta med lektion (bara i minnet)
   history: [], // kort sammanfattning av alla körningar i sessionen (bara i minnet)
   copied: { result: false, recovery: false, analysis: false }, // har eleven kopierat efter senaste körningen?
   manualDone: {}, // steg i lektionsguiden som eleven själv bockat av

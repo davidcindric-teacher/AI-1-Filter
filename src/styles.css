@@ -23,16 +23,6 @@
 /* Klassen .explain m.fl. sätter display; hidden måste ändå alltid gälla. */
 [hidden] { display: none !important; }
 
-/* Visningsläge: "Förenklad" döljer extra förklaringar och detaljer (styrs av data-view på <html>). */
-.only-simple { display: none; }
-[data-view='simple'] .only-simple { display: block; }
-[data-view='simple'] .only-standard,
-[data-view='simple'] .explain-btn,
-[data-view='simple'] .explain,
-[data-view='simple'] .hint { display: none !important; }
-/* Lektion 5: analysmallen i Fördjupning behövs även i Förenklad visning. */
-[data-view='simple'][data-lesson='5'] #extra.only-standard { display: block !important; }
-
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 4.5rem; }
 
 body {
@@ -82,13 +72,6 @@ a { color: var(--accent-dark); text-underline-offset: 0.15em; }
 .drawer-list a { display: flex; align-items: center; min-height: 52px; padding: 0.4rem 0.75rem; border-radius: var(--radius); font-weight: 600; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--border); }
 .drawer-list a:hover { background: var(--soft); color: var(--accent-dark); }
 body.menu-open { overflow: hidden; }
-.view-row { display: flex; align-items: center; gap: 0.5rem 0.75rem; margin: 0; }
-.view-label { font-weight: 700; }
-.view-toggle { display: inline-flex; }
-.view-toggle .btn { border-radius: 0; min-height: 44px; padding-block: 0.3rem; }
-.view-toggle .btn:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-.view-toggle .btn:last-child { border-radius: 0 var(--radius) var(--radius) 0; margin-left: -2px; }
-.view-toggle .btn[aria-pressed='false'] { background: #fff; color: var(--accent-dark); }
 .site-header { border-bottom: 4px solid var(--accent); padding-block: 0.75rem 0.5rem; }
 .eyebrow { color: var(--accent-dark); font-weight: 700; margin: 0 0 0.25rem; letter-spacing: 0.02em; }
 .save-banner { background: var(--soft); border-left: 5px solid var(--accent); padding: 0.75rem 1rem; margin-block: 0.75rem; }
@@ -396,17 +379,14 @@ figure.charts { margin: 1rem 0; }
   .credit-top { display: none; }
   .credit-header { display: block; text-align: left; margin-bottom: 0.25rem; }
   .topbar-inner { gap: 0.5rem; }
-  .view-label { position: absolute; left: -9999px; }
   .topbar-inner { flex-wrap: nowrap; }
   .menu-btn { padding-inline: 0.6rem 0.75rem; gap: 0.45rem; }
-  .view-toggle .btn { padding-inline: 0.75rem; }
   .lesson-picker .btn { width: auto; flex: 1 1 auto; padding-inline: 0.5rem; }
   .lesson-picker { gap: 0.4rem; }
   .run-tab { flex: 1 1 auto; width: auto; padding-inline: 0.5rem; }
   .btn-link { width: auto; }
   .topbar .menu-btn { width: auto; }
   .btn { width: 100%; }
-  .view-toggle .btn { width: auto; }
   .btn-small { width: auto; }
   .button-row { flex-direction: column; }
   .wrap { padding-inline: 1rem; }

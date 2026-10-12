@@ -15,6 +15,7 @@ import { mountEditor } from './ui/editor.js';
 import { mountFinalTest } from './ui/finalTest.js';
 import { mountSave } from './ui/save.js';
 import { mountExtra } from './ui/extra.js';
+import { mountAnalysis } from './ui/extraAnalysis.js';
 import { mountLessons } from './ui/lessonPicker.js';
 import { mountStepper } from './ui/stepper.js';
 
@@ -41,7 +42,6 @@ function restoreConvenience(state) {
   }
   if (Object.prototype.hasOwnProperty.call(MODES, saved.mode)) next.mode = saved.mode;
   if (isValidLesson(saved.lesson)) next.lesson = saved.lesson;
-  if (saved.view === 'simple' || saved.view === 'standard') next.view = saved.view;
   if (DATASET_KEYS.includes(saved.datasetKey)) next.datasetKey = saved.datasetKey;
   if (Array.isArray(saved.mixIds)) next.mixIds = normalizeMixIds(saved.mixIds.filter((x) => typeof x === 'string'));
   if (typeof saved.attemptName === 'string') next.attemptName = saved.attemptName.slice(0, 80);
@@ -79,20 +79,6 @@ function mountErrors(store) {
       ),
     );
   });
-}
-
-/** Växlare mellan Standard och Förenklad visning. Påverkar bara vad som visas, aldrig modell eller resultat. */
-function mountViewToggle(store) {
-  const root = $('#view-toggle');
-  const options = [['standard', 'Standard'], ['simple', 'Förenklad']];
-  const buttons = options.map(([key, label]) => h('button', { type: 'button', class: 'btn btn-small', text: label, onclick: () => store.set({ view: key }) }));
-  replace(root, buttons);
-  const render = (state) => {
-    document.documentElement.dataset.view = state.view;
-    buttons.forEach((b, i) => b.setAttribute('aria-pressed', String(options[i][0] === state.view)));
-  };
-  store.subscribe(render);
-  render(store.get());
 }
 
 /** Hamburgarmeny till vänster med lektionsval och lektionsguide. Fungerar med tangentbord (Esc stänger, Tab hålls inne i menyn). */
@@ -163,7 +149,6 @@ function start() {
     target.focus();
     target.scrollIntoView();
   });
-  mountViewToggle(store);
   const menu = mountMenu();
   if (unsupported) store.set({ error: { message: unsupported, details: [] } });
 
@@ -176,6 +161,7 @@ function start() {
   mountEditor($('#mount-editor'), $('#mount-improve-train'), store);
   mountFinalTest($('#mount-final'), store);
   mountExtra($('#mount-extra'), store);
+  mountAnalysis($('#mount-analysis'), store);
   mountLessons(store, { closeMenu: menu.close });
   mountStepper(store);
 
@@ -183,7 +169,7 @@ function start() {
   let timer = null;
   store.subscribe((s) => {
     clearTimeout(timer);
-    timer = setTimeout(() => saveConvenience({ view: s.view, lesson: s.lesson, settings: s.settings, mode: s.mode, datasetKey: s.datasetKey, attemptName: s.attemptName, edits: s.edits, mixIds: s.mixIds }), 400);
+    timer = setTimeout(() => saveConvenience({ lesson: s.lesson, settings: s.settings, mode: s.mode, datasetKey: s.datasetKey, attemptName: s.attemptName, edits: s.edits, mixIds: s.mixIds }), 400);
   });
   // Synka försöksnamnet i fältet efter en återställning
   store.subscribe((s) => {

@@ -38,7 +38,7 @@ export function mountSettings(root, store) {
     return row;
   };
   const modeHelp = h('p', { class: 'muted', id: 'mode-help' });
-  const extendedBox = h('details', { class: 'only-standard extended-modes', open: EXTENDED_MODES.includes(s0.mode) }, h('summary', { text: 'Utökade laborationer (för dig som är klar tidigt)' }), EXTENDED_MODES.map(modeRadio));
+  const extendedBox = h('details', { class: 'extended-modes', open: EXTENDED_MODES.includes(s0.mode) }, h('summary', { text: 'Utökade laborationer (för dig som är klar tidigt)' }), EXTENDED_MODES.map(modeRadio));
   const modeSet = h('fieldset', { class: 'plain-fieldset' }, h('legend', { text: 'Välj laboration' }), CORE_MODES.map(modeRadio), extendedBox);
 
   const numberField = (id, key, labelNode, opts = {}) => {
@@ -67,7 +67,7 @@ export function mountSettings(root, store) {
 
   const advanced = h(
     'details',
-    { class: 'advanced only-standard' },
+    { class: 'advanced' },
     h('summary', { text: 'Avancerade inställningar (behöver oftast inte ändras)' }),
     h('p', { class: 'muted', text: 'Ändra bara en sak i taget och behåll samma värden i alla körningar du vill jämföra.' }),
     h('div', { class: 'field-grid' }, lr.el, batch.el, hidden.el),
@@ -82,7 +82,7 @@ export function mountSettings(root, store) {
 
   // Vanlig (icke-live) text: den bara upprepar värden som redan finns i fälten ovan, så den ska inte avbryta
   // en skärmläsare med ett utrop vid varje knapptryckning medan eleven skriver i ett av fälten.
-  const summary = h('p', { class: 'muted only-standard' });
+  const summary = h('p', { class: 'muted' });
   const info = h('div', { class: 'model-info' });
 
   root.append(
@@ -93,8 +93,7 @@ export function mountSettings(root, store) {
     advanced,
     reset,
     summary,
-    h('details', { class: 'only-standard' }, h('summary', { text: 'Läs mer om hela modellen (dolt lager, sannolikhet, vikter)' }), info),
-    h('p', { class: 'only-simple muted', text: 'Modellen räknar vilka ord som finns i texten och ger en sannolikhet för spam. Tröskeln är 50 %.' }),
+    h('details', {}, h('summary', { text: 'Läs mer om hela modellen (dolt lager, sannolikhet, vikter)' }), info),
   );
 
   const fields = { epochs, seed, learningRate: lr, batchSize: batch, hiddenUnits: hidden };

@@ -16,17 +16,19 @@ const PAGES = [
   ['byt-texter', 'Byt ut texter'],
   ['fore-efter', 'Träna före och efter'],
   ['sluttest', 'Sluttest'],
-  ['extra', 'Fördjupning'],
+  ['analys', 'Analys'],
   ['spara', 'Spara och återställ'],
+  ['extra', 'Fördjupning'],
 ];
 
 /**
- * Lektioner som behöver en annan ordning än sidans. I lektion 4 tränar "Träna modellen" före och efter, vilket
- * kräver att texterna redan är utbytta. Därför kommer Byt ut texter och Träna före och efter före Resultat,
- * och Välj dataset (låst till B) och Träna modellen hoppas över.
+ * Lektioner som behöver en annan ordning än sidans. I lektion 3 är datasetet låst till B, så Välj dataset hoppas över.
+ * I lektion 4 tränar "Träna före och efter" båda modellerna, vilket kräver att texterna redan är utbytta. Därför
+ * kommer Byt ut texter och Träna före och efter före Resultat, och Välj dataset (låst till B) och Träna modellen hoppas över.
  */
 const LESSON_ORDER = {
-  4: ['intro', 'installningar', 'byt-texter', 'fore-efter', 'resultat', 'testa', 'sluttest', 'extra', 'spara'],
+  3: ['intro', 'installningar', 'trana', 'resultat', 'spara', 'extra'],
+  4: ['intro', 'installningar', 'byt-texter', 'fore-efter', 'resultat', 'sluttest', 'spara', 'extra'],
 };
 
 /**
@@ -116,12 +118,10 @@ export function mountStepper(store) {
 
   const render = (state) => {
     on = state.screen === 'lesson' && state.lesson !== 'all';
-    // Fördjupning är dold i Förenklad visning, utom i lektion 5 där analysmallen är lektionens huvuduppgift.
-    const standardOnly = (p) => p.section.classList.contains('only-standard') && state.lesson !== 5;
-    const shown = (p) => isVisibleIn(p.section.dataset.lessons, state.lesson) && !(state.view === 'simple' && standardOnly(p));
+    const shown = (p) => isVisibleIn(p.section.dataset.lessons, state.lesson);
     const order = LESSON_ORDER[state.lesson];
     const visible = order ? order.map((id) => all.find((p) => p.id === id)).filter(shown) : all.filter(shown);
-    const nextSig = `${state.screen}|${state.lesson}|${state.view}|${visible.map((p) => p.id).join(',')}`;
+    const nextSig = `${state.screen}|${state.lesson}|${visible.map((p) => p.id).join(',')}`;
     if (nextSig === sig) return;
     sig = nextSig;
     const cur = pages[index];

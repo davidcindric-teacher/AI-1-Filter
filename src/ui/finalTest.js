@@ -28,7 +28,7 @@ export function mountFinalTest(root, store) {
       { class: 'callout callout-strong' },
       h('p', {}, h('strong', { text: 'Sluttestet är ett engångstest och får inte användas för att justera modellen. ' }), 'Kör det när du är färdig med din förbättring. Ändrar du modellen eller träningsdatan efter att du sett resultatet är sluttestet inte längre ett oberoende test.'),
     );
-    const intro = h('p', { class: 'only-standard' }, `Sluttestet består av ${FINAL_TEST_TEXTS.length} texter (10 spam, 10 vanliga) som är skilda från både träningsdata och valideringsdata. Texterna kan inte redigeras och visas inte som träningsmaterial. Om modellen svarar fel visas just de texterna i resultatet.`);
+    const intro = h('p', {}, `Sluttestet består av ${FINAL_TEST_TEXTS.length} texter (10 spam, 10 vanliga) som är skilda från både träningsdata och valideringsdata. Texterna kan inte redigeras och visas inte som träningsmaterial. Om modellen svarar fel visas just de texterna i resultatet.`);
     if (!ready) {
       replace(body, intro, warning, h('p', { class: 'muted' }, 'Träna först i steget ', h('a', { href: '#fore-efter', text: 'Träna före och efter' }), '. Sedan kan du köra sluttestet här.'), state.finalTestRuns ? h('p', { class: 'muted', text: `Sluttestet har körts ${state.finalTestRuns} gång(er) under den här sessionen.` }) : null);
       return;

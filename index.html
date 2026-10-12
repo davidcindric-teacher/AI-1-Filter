@@ -15,10 +15,6 @@
           <span class="burger" aria-hidden="true"></span>
           <span>Meny</span>
         </button>
-        <div class="view-row">
-          <span id="view-label" class="view-label">Visning:</span>
-          <div id="view-toggle" class="view-toggle" role="group" aria-labelledby="view-label"></div>
-        </div>
         <p class="credit credit-top">Skapad av David Cindric<br />Amerikanska Gymnasiet</p>
       </div>
       <div class="wrap"><div id="error-region" role="alert" aria-live="assertive"></div></div>
@@ -91,8 +87,8 @@
             I den här lektionen tränar du inga nya modeller. Du <strong>analyserar dina egna resultat</strong> från lektion 1–4 i ditt arbetsdokument.
           </p>
           <ol class="steps">
-            <li>Läs in din återställningstext från en tidigare lektion i steget <strong>Resultat</strong>, så att siffrorna finns i appen igen.</li>
-            <li>Kopiera analysmallen i steget <strong>Fördjupning</strong>. Den har rubriker och stödfrågor med dina siffror ifyllda.</li>
+            <li>Läs in en återställningstext från en tidigare lektion i steget <strong>Resultat</strong> och klicka på <strong>Träna nu</strong>, så att siffrorna finns i appen igen. Upprepa för varje lektion du vill ha med.</li>
+            <li>Kopiera analysmallen i steget <strong>Analys</strong>. Den har rubriker och stödfrågor med siffrorna från alla lektioner du läst in.</li>
             <li>Skriv analysen själv. Varje påstående ska stödjas av dina egna siffror.</li>
             <li>Byt analys med en kamrat och granska den med checklistan.</li>
           </ol>
@@ -113,7 +109,7 @@
               <dd>20 texter som bara används en gång, som ett sista test efter din förbättring. Du får <strong>inte</strong> använda sluttestet för att justera modellen efteråt.</dd>
             </div>
           </dl>
-          <p class="muted only-standard">
+          <p class="muted">
             Modellen förstår inte text som en människa. Den räknar med vilka ord som finns, och resultaten är osäkra eftersom underlaget är litet.
           </p>
         </details>
@@ -147,7 +143,7 @@
         <div id="mount-results"></div>
       </section>
 
-      <section id="testa" data-lessons="1 2 3 4" aria-labelledby="h-test">
+      <section id="testa" data-lessons="1 2" aria-labelledby="h-test">
         <h2 id="h-test">Testa egen text</h2>
         <div id="mount-tester"></div>
       </section>
@@ -168,14 +164,20 @@
         </div>
       </section>
 
-      <section id="extra" class="only-standard" data-lessons="1 2 3 4 5" aria-labelledby="h-extra">
-        <h2 id="h-extra">Fördjupning</h2>
-        <div id="mount-extra"></div>
+
+      <section id="analys" data-lessons="5" aria-labelledby="h-analys">
+        <h2 id="h-analys">Analys</h2>
+        <div id="mount-analysis"></div>
       </section>
 
       <section id="spara" data-lessons="1 2 3 4 5" aria-labelledby="h-save">
         <h2 id="h-save">Spara och återställ</h2>
         <div id="mount-save"></div>
+      </section>
+
+      <section id="extra" data-lessons="1 2 3 4" aria-labelledby="h-extra">
+        <h2 id="h-extra">Fördjupning</h2>
+        <div id="mount-extra"></div>
       </section>
     </main>
 

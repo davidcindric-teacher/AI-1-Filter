@@ -170,7 +170,6 @@ export function mountLessons(store, { closeMenu }) {
     lastLesson = state.lesson;
     heading.textContent = state.lesson === 'all' ? 'Alla avsnitt' : `Lektion ${state.lesson}: ${LESSONS[state.lesson].title}`;
     goal.textContent = state.lesson === 'all' ? 'Hela appen visas på en sida.' : LESSONS[state.lesson].goal;
-    document.documentElement.dataset.lesson = String(state.lesson);
     // Begreppen är öppna i lektion 1 (där de introduceras) och hopfällda som repetition i lektion 2–4.
     // I läget Alla är de öppna på bred skärm men hopfällda på mobil, där de annars tar nästan en hel skärm.
     const narrow = window.matchMedia('(max-width: 40rem)').matches;

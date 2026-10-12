@@ -40,7 +40,7 @@ export function mountTester(root, store) {
         h('p', { class: 'muted', text: 'Sannolikheten är modellens uppskattning och inte en garanti. Modellen kan ha fel, särskilt på texter som skiljer sig från träningsdata.' }),
         h(
           'p',
-          { class: 'only-standard' },
+          {},
           'Så här såg modellen din text (grönmarkerade ord finns i vokabulären, övriga ignoreras): ',
           answer.tokens.length ? answer.tokens.map((t, i) => [h('span', { class: `token ${t.known ? 'known' : 'unknown'}`, text: t.word }), i < answer.tokens.length - 1 ? ' ' : '']) : 'inga ord',
           h('span', { class: 'muted', text: ` (${answer.knownCount} av ${new Set(answer.tokens.map((t) => t.word)).size} olika ord kändes igen)` }),
@@ -98,7 +98,7 @@ export function mountTester(root, store) {
                 headers: ['Text', 'Modell', 'Modellens svar', 'Spam-sannolikhet'],
                 rows: state.testLog.map((t) => [t.text, t.runLabel, LABEL_NAMES[t.predicted], formatMetric(t.probability)]),
               }),
-              h('p', { class: 'muted only-standard', text: 'Listan tas med i resultatblocket. Den försvinner om du laddar om sidan.' }),
+              h('p', { class: 'muted', text: 'Listan tas med i resultatblocket. Den försvinner om du laddar om sidan.' }),
               h('button', { type: 'button', class: 'btn btn-secondary', text: 'Rensa listan', onclick: () => store.set({ testLog: [] }) }),
             ]
           : null,

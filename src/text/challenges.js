@@ -51,7 +51,6 @@ export const CHALLENGES = [
     key: 'analysis',
     title: 'Lektion 5: Individuell analys',
     tasks: [
-      'Kopiera analysmallen (ovan i steget Fördjupning) och fyll i rubrikerna med egna ord.',
       'Byt analys med en kamrat och granska med checklistan. Vilka påståenden saknar stöd i siffror?',
       'Sammanställ dina körningar i en tabell (dataset, epoker, frö, accuracy, precision, recall, F1) med hjälp av dina resultatblock.',
       'Skriv en slutsats där varje påstående stöds av ett tal från dina egna körningar, och ange minst en osäkerhet.',

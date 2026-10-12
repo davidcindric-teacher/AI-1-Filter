@@ -97,7 +97,7 @@ function errorAnalysis(run) {
   if (items.length === 0) return null;
   return h(
     'details',
-    { class: 'only-standard' },
+    {},
     h('summary', { text: 'Felanalys: vilka ord fanns i de felklassificerade texterna?' }),
     h('p', { class: 'muted', text: 'S = antal spamtexter i träningsdatan där ordet finns, V = antal vanliga texter. Ord som modellen inte känner igen (finns inte i träningsdatan) ignoreras helt av modellen.' }),
     table({
@@ -203,7 +203,7 @@ function runArticle(run, index, lesson) {
     accuracyChart(run),
     notesInMain ? notes : null,
     errorAnalysis(run),
-    h('details', { class: 'only-standard run-details' }, h('summary', { text: 'Detaljer: modell, loss-kurva och värden per epok' }), meta, lossChart(run), notesInMain ? null : notes, epochTable(run)),
+    h('details', { class: 'run-details' }, h('summary', { text: 'Detaljer: modell, loss-kurva och värden per epok' }), meta, lossChart(run), notesInMain ? null : notes, epochTable(run)),
   );
 }
 
@@ -217,7 +217,6 @@ function comparison(runs, mode) {
     runs.every((r) => r.label === r.datasetName) ? null : row('Dataset', (r) => r.datasetName),
     row('Antal epoker', (r) => String(r.settings.epochs)),
     row('Slumpfrö', (r) => String(r.settings.seed)),
-    row('Startläge-id', (r) => r.startId),
     showVocab ? row('Ord i vokabulären', (r) => String(r.vocabSize)) : null,
     showLr ? row('Learning rate', (r) => formatNumber(r.settings.learningRate, 3)) : null,
     showHidden ? row('Antal dolda noder', (r) => String(r.settings.hiddenUnits)) : null,
@@ -230,6 +229,7 @@ function comparison(runs, mode) {
     row('Falskt negativa', (r) => String(r.validation.metrics.fn)),
   ].filter(Boolean);
   const techRows = [
+    row('Startläge-id', (r) => r.startId),
     showVocab ? null : row('Ord i vokabulären', (r) => String(r.vocabSize)),
     showLr ? null : row('Learning rate', (r) => formatNumber(r.settings.learningRate, 3)),
     showHidden ? null : row('Antal dolda noder', (r) => String(r.settings.hiddenUnits)),
@@ -240,7 +240,7 @@ function comparison(runs, mode) {
     { class: 'comparison' },
     h('h3', { text: 'Jämförelse sida vid sida' }),
     table({ caption: 'Alla körningar har samma valideringsdata.', headers, rowHeaders: true, rows: mainRows }),
-    techRows.length ? h('details', { class: 'only-standard' }, h('summary', { text: 'Fler tekniska uppgifter' }), table({ headers, rowHeaders: true, rows: techRows })) : null,
+    h('details', {}, h('summary', { text: 'Fler tekniska uppgifter' }), table({ headers, rowHeaders: true, rows: techRows })),
   );
 }
 
@@ -321,11 +321,12 @@ export function mountResults(root, store, { onCopy }) {
   // Lektion 5: resultaten finns bara kvar tills sidan laddas om, så eleven läser först in en återställningstext
   // från en tidigare lektion. Rutan byggs en gång (inte i render) så att meddelandet efter inläsningen finns kvar.
   const restoreRoot = h('div');
+  const restoreHeading = h('h3');
   const restoreBox = h(
     'div',
     { class: 'callout restore-box' },
-    h('h3', { text: 'Börja här: läs in dina resultat' }),
-    h('p', {}, 'Resultaten från tidigare lektioner finns inte kvar i appen. Klistra in återställningstexten från ditt arbetsdokument, till exempel från lektion 4, och träna sedan om. Du får exakt samma resultat som förra gången.'),
+    restoreHeading,
+    h('p', {}, 'Resultaten från tidigare lektioner finns inte kvar i appen. Klistra in återställningstexten från ditt arbetsdokument och klicka sedan på Träna nu. Du får exakt samma resultat som förra gången. Upprepa för varje lektion du vill ha med i analysen. Alla inlästa lektioner tas med i analysmallen.'),
     restoreRoot,
   );
   mountRestore(restoreRoot, store, { idPrefix: 'result-', keepLesson: true });
@@ -334,7 +335,8 @@ export function mountResults(root, store, { onCopy }) {
   let lastRunsForTabs = null;
   const tabState = { index: 0 };
   const render = (state) => {
-    restoreBox.hidden = !(state.lesson === 5 && state.runs.length === 0);
+    restoreBox.hidden = state.lesson !== 5;
+    restoreHeading.textContent = state.analysisRuns.length ? 'Läs in fler lektioner' : 'Börja här: läs in dina resultat';
     const sig = [state.runs, state.lesson, state.history, state.runsMode, state.mode];
     if (sig.every((v, i) => v === last[i])) return;
     last = sig;
@@ -354,25 +356,25 @@ export function mountResults(root, store, { onCopy }) {
       body,
       h(
         'div',
-        { class: 'callout only-standard' },
-        h('p', {}, h('strong', { text: 'Läs resultaten med försiktighet.' })),
-        h('ul', {}, cautionPoints(state.lesson).map((t) => h('li', { text: t }))),
-      ),
-      h('p', { class: 'callout only-simple' }, h('strong', { text: 'Tänk på: ' }), 'Resultatet beror på träningsdata. 20 valideringstexter är få, så slutsatserna är osäkra. Hög accuracy betyder inte automatiskt en bra modell.'),
-      h(
-        'div',
         { class: 'button-row result-actions' },
         h('button', { type: 'button', class: 'btn btn-primary', text: 'Kopiera resultatblock', onclick: () => onCopy('result') }),
         // I lektion 4 leder knapparna vidare i förbättringsflödet i stället för tillbaka till början.
         improveFlow ? h('a', { class: 'btn btn-secondary btn-link', href: '#sluttest', text: 'Gå till sluttestet', onclick: (e) => { e.preventDefault(); goToSection('#sluttest'); } }) : null,
-        state.lesson === 5 || improveFlow ? null : h('a', { class: 'btn btn-secondary btn-link', href: '#testa', text: 'Testa egen text', onclick: (e) => { e.preventDefault(); goToSection('#testa'); } }),
+        [1, 2, 'all'].includes(state.lesson) && !improveFlow ? h('a', { class: 'btn btn-secondary btn-link', href: '#testa', text: 'Testa egen text', onclick: (e) => { e.preventDefault(); goToSection('#testa'); } }) : null,
         state.lesson === 5 ? null : h('a', { class: 'btn btn-secondary btn-link', href: retrain, text: 'Träna om', onclick: (e) => { e.preventDefault(); goToSection(retrain); } }),
       ),
       runs.length > 1 ? comparison(runs, state.runsMode) : null,
       runsView(runs, state.lesson, tabState),
+      // Förbehållen kommer efter siffrorna, så att eleven först ser resultatet och sedan läser hur det ska tolkas.
+      h(
+        'div',
+        { class: 'callout' },
+        h('p', {}, h('strong', { text: 'Läs resultaten med försiktighet.' })),
+        h('ul', {}, cautionPoints(state.lesson).map((t) => h('li', { text: t }))),
+      ),
       // Historiken (hopfälld, sist) visas först när det finns äldre körningar utöver de som redan syns ovan.
       state.history.length > runs.length ? historyBox(state.history, () => store.set({ history: [] })) : null,
-      h('p', { class: 'muted only-standard', text: `Modellbeskrivning: ${architectureText(runs[0])}` }),
+      h('p', { class: 'muted', text: `Modellbeskrivning: ${architectureText(runs[0])}` }),
     );
   };
   store.subscribe(render);

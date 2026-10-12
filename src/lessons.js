@@ -93,9 +93,9 @@ export function guideSteps(lesson, s) {
       ];
     default:
       return [
-        auto('l5-template', '#extra', 'Kopiera analysmallen (steget Fördjupning)', s.copied.analysis),
-        manual('l5-write', '#spara', 'Skriv din analys i ditt dokument. Varje påstående ska stödjas av dina egna siffror'),
-        manual('l5-review', '#extra', 'Byt analys med en kamrat och granska med checklistan'),
+        auto('l5-template', '#analys', 'Kopiera analysmallen (steget Analys)', s.copied.analysis),
+        manual('l5-write', '#analys', 'Skriv din analys i ditt dokument. Varje påstående ska stödjas av dina egna siffror'),
+        manual('l5-review', '#analys', 'Byt analys med en kamrat och granska med checklistan'),
         auto('l5-copy', '#spara', 'Kopiera resultatblock och återställningstext', copied),
       ];
   }

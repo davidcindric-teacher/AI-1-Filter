@@ -19,7 +19,7 @@ const examples = (rows) => {
   );
 };
 
-/** Hopfälld ruta med några exempel (alltid) och, i Standard, alla texter och vokabulärens storlek. */
+/** Hopfälld ruta med några exempel, alla texter och vokabulärens storlek. */
 const cardDetails = (rows, vocabSize) =>
   h(
     'details',
@@ -28,7 +28,7 @@ const cardDetails = (rows, vocabSize) =>
     examples(rows),
     h(
       'div',
-      { class: 'only-standard' },
+      {},
       h('p', { class: 'muted', text: `Vokabulär: ${vocabSize} olika ord.` }),
       table({ headers: ['Klass', 'Text'], rows: rows.map((r) => [LABEL_NAMES[r.label], r.text]) }),
     ),
@@ -57,8 +57,7 @@ export function mountDatasetPicker(root, store) {
     h('p', {}, 'Ett dataset är en samling texter med facit (spam eller vanligt). Alla texter är påhittade.'),
     fieldset,
     note,
-    h('details', { class: 'only-standard' }, h('summary', { text: 'Vilken data används till vad?' }), separation, h('p', { class: 'muted', text: 'Modellen tränar bara på träningsdata.' })),
-    h('p', { class: 'only-simple muted', text: 'Modellen tränar bara på träningsdata. Valideringsdata och sluttestet används bara för att testa modellen.' }),
+    h('details', {}, h('summary', { text: 'Vilken data används till vad?' }), separation, h('p', { class: 'muted', text: 'Modellen tränar bara på träningsdata.' })),
     demoRoot,
   );
   mountModelDemo(demoRoot, store);
@@ -100,7 +99,8 @@ export function mountDatasetPicker(root, store) {
       );
     };
     const vocabSize = (rows) => buildVocabulary(rows.map((r) => r.text)).words.length;
-    const allowed = allowedDatasets(state.lesson);
+    // Mix C hör bara till den utökade laborationen. Annars syns kortet bara som ett låst kort med en varning.
+    const allowed = allowedDatasets(state.lesson).filter((k) => k !== 'mix' || state.mode === 'compare-abc' || state.lesson === 'all');
     const all = {
       a: () => mk('a', DATASETS.a.name, DATASETS.a.description, DATASETS.a.texts, cardDetails(DATASETS.a.texts, vocabSize(DATASETS.a.texts))),
       b: () => mk('b', DATASETS.b.name, DATASETS.b.description, DATASETS.b.texts, cardDetails(DATASETS.b.texts, vocabSize(DATASETS.b.texts))),
