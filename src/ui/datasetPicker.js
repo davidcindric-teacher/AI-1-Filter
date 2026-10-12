@@ -105,7 +105,7 @@ export function mountDatasetPicker(root, store) {
       a: () => mk('a', DATASETS.a.name, DATASETS.a.description, DATASETS.a.texts, cardDetails(DATASETS.a.texts, vocabSize(DATASETS.a.texts))),
       b: () => mk('b', DATASETS.b.name, DATASETS.b.description, DATASETS.b.texts, cardDetails(DATASETS.b.texts, vocabSize(DATASETS.b.texts))),
       custom: () =>
-        mk('custom', 'Egen förbättrad version av B', 'dataset B där du bytt ut fem texter per klass', custom.rows, h('p', { class: custom.ok ? 'ok' : 'warn' }, custom.ok ? 'Giltig och redo att tränas. ' : 'Inte klar än: ', custom.ok ? '' : h('a', { href: '#byt-texter', text: 'Gå till steget Byt ut texter' }))),
+        mk('custom', 'Egen förbättrad version av B', 'dataset B där du bytt ut minst fem texter per klass', custom.rows, h('p', { class: custom.ok ? 'ok' : 'warn' }, custom.ok ? 'Giltig och redo att tränas. ' : 'Inte klar än: ', custom.ok ? '' : h('a', { href: '#byt-texter', text: 'Gå till steget Byt ut texter' }))),
       mix: () =>
         mk('mix', MIX_NAME, 'du väljer själv 20 + 20 texter ur A och B', mixRows(state.mixIds), h('p', { class: mixCheck.ok ? 'ok' : 'warn' }, mixCheck.ok ? 'Giltigt och redo att tränas.' : 'Inte klart än: ', mixCheck.ok ? '' : h('a', { href: '#extra', text: 'Välj texter i steget Fördjupning' }))),
     };

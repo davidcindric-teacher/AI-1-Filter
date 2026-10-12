@@ -10,7 +10,7 @@ export const LABEL_HAM = 'vanlig';
 export const LABEL_NAMES = { [LABEL_SPAM]: 'Spam', [LABEL_HAM]: 'Vanligt meddelande' };
 
 export const CLASS_SIZE = 20; // exakt antal träningstexter per klass
-export const SWAP_COUNT = 5; // exakt antal texter som ska bytas ut per klass i lektion 4
+export const SWAP_COUNT = 5; // minsta antal texter som ska bytas ut per klass i lektion 4
 export const MAX_TEXT_LENGTH = 300;
 
 // Lärarkod som låser upp "Visa alla avsnitt" och sluttestet. Ingen säkerhet (koden syns i källkoden),

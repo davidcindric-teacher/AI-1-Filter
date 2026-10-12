@@ -29,7 +29,7 @@ export function mountEditor(root, trainRoot, store) {
     return h(
       'fieldset',
       { class: 'edit-group' },
-      h('legend', { text: `${name} (${rows.length} texter, byt ut exakt ${SWAP_COUNT})` }),
+      h('legend', { text: `${name} (${rows.length} texter, byt ut minst ${SWAP_COUNT})` }),
       rows.map((r, i) => {
         const inputId = `edit-${r.id}`;
         const rowLabel = `${name} ${i + 1}`;
@@ -68,7 +68,7 @@ export function mountEditor(root, trainRoot, store) {
   });
 
   root.append(
-    h('p', {}, 'Utgå från dataset B och byt ut exakt ', h('strong', { text: `${SWAP_COUNT} texter i varje klass` }), ' mot egna påhittade texter som du tror gör modellen bättre. Klasserna ligger fast: en spamtext byts mot en spamtext och en vanlig text mot en vanlig text. Datamängden ska fortfarande ha exakt ', String(CLASS_SIZE), ' spamtexter och ', String(CLASS_SIZE), ' vanliga texter.'),
+    h('p', {}, 'Utgå från dataset B och byt ut minst ', h('strong', { text: `${SWAP_COUNT} texter i varje klass` }), ' mot egna påhittade texter som du tror gör modellen bättre. Klasserna ligger fast: en spamtext byts mot en spamtext och en vanlig text mot en vanlig text. Datamängden ska fortfarande ha exakt ', String(CLASS_SIZE), ' spamtexter och ', String(CLASS_SIZE), ' vanliga texter.'),
     h('p', { class: 'callout' }, h('strong', { text: 'Tips: ' }), 'Vilka texter klassificerade modellen fel med dataset B i lektion 2 och 3? Titta i dina resultatblock på de felklassificerade texterna. Vilka ord saknades i träningsdatan? Byt ut texter som liknar varandra mot texter med sådana ord.'),
     h('p', { class: 'muted', text: 'Texter som är identiska med valideringsdata eller sluttestet, tomma texter och dubbletter nekas.' }),
     summary,
@@ -120,7 +120,7 @@ export function mountEditor(root, trainRoot, store) {
     const hamRows = check.rows.filter((r) => r.label === 'vanlig').length;
     replace(
       summary,
-      h('p', {}, h('strong', { text: 'Kontroll: ' }), `spam ${spamRows} av ${CLASS_SIZE} texter, ${check.changes.spam} av ${SWAP_COUNT} utbytta · vanliga ${hamRows} av ${CLASS_SIZE} texter, ${check.changes.vanlig} av ${SWAP_COUNT} utbytta`),
+      h('p', {}, h('strong', { text: 'Kontroll: ' }), `spam ${spamRows} av ${CLASS_SIZE} texter, ${check.changes.spam} utbytta (minst ${SWAP_COUNT}) · vanliga ${hamRows} av ${CLASS_SIZE} texter, ${check.changes.vanlig} utbytta (minst ${SWAP_COUNT})`),
       check.ok ? h('p', { class: 'ok', text: 'Datamängden är giltig och kan tränas.' }) : h('p', { class: 'warn', text: 'Datamängden är inte klar än:' }),
     );
     replace(problems, check.ok ? null : check.problems.map((p) => h('li', { text: p })));

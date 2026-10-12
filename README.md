@@ -13,7 +13,7 @@ Appen **ersätter inte elevernas arbetsdokument**. Den är ett labbverktyg. Lekt
 | 1 | En träning | Dataset A, 30 epoker, fast valideringsmängd. Eleven testar fyra egna meddelanden (Testa egen text). Testtexter läggs aldrig till i träningsdata. |
 | 2 | Jämför A och B | Två separata modeller, samma slumpfrö, arkitektur, epoker och valideringsdata. Resultat sida vid sida. |
 | 3 | Jämför 5, 30, 100 epoker | Dataset B tränas tre gånger från samma startläge. Kurvor, mått per epok, försiktiga tolkningshjälp. Appen påstår inte att fler epoker alltid är bättre. |
-| 4 | Före och efter förbättring | Eleven byter ut exakt 5 texter per klass i B (Skapa egen förbättrad data). Före/efter jämförs på valideringsdata och på ett **låst sluttest**. |
+| 4 | Före och efter förbättring | Eleven byter ut minst 5 texter per klass i B (Skapa egen förbättrad data). Före/efter jämförs på valideringsdata och på ett **låst sluttest**. |
 | 5 | (görs i arbetsdokumentet) | Appen ger resultatblock som kan kopieras in. |
 
 ## Lektionsväljare och lektionsguide
@@ -138,7 +138,7 @@ src/
   ml/                  rng, tokenizer, vectorizer, network (modell + SGD), trainer
   metrics.js           accuracy, precision, recall, F1, förväxlingsmatris
   dataChecks.js        kontroll av träningsdata (20/20, dubbletter, ingen läcka)
-  customData.js        förbättrad dataset B (exakt 5 utbytta per klass)
+  customData.js        förbättrad dataset B (minst 5 utbytta per klass)
   experiments.js       laborationsupplägg (lektion 1–4)
   report.js            resultatblock
   recovery.js          export/import av återställningstext

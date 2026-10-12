@@ -85,7 +85,7 @@ export function guideSteps(lesson, s) {
       ];
     case 4:
       return [
-        auto('l4-data', '#byt-texter', 'Byt ut fem texter per klass så att datamängden är giltig', validateCustomDataset(s.edits).ok),
+        auto('l4-data', '#byt-texter', 'Byt ut minst fem texter per klass så att datamängden är giltig', validateCustomDataset(s.edits).ok),
         auto('l4-train', '#fore-efter', 'Träna före och efter förbättringen', trained(['improve'])),
         auto('l4-final', '#sluttest', 'Kör sluttestet en gång', s.finalTestRuns >= 1),
         manual('l4-compare', '#sluttest', 'Jämför före och efter på både valideringsdata och sluttest i ditt dokument'),

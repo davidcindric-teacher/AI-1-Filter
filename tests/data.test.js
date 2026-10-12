@@ -68,14 +68,17 @@ describe('13. Exakt 20 texter per klass', () => {
     const codes = findTrainingProblems(rows).map((p) => p.code);
     expect(codes).toEqual(expect.arrayContaining(['empty', 'duplicate', 'no-label']));
   });
-  it('kräver exakt fem utbytta texter per klass i förbättrad data', () => {
+  it('kräver minst fem utbytta texter per klass i förbättrad data', () => {
     expect(validateCustomDataset(validEdits()).ok).toBe(true);
     expect(validateCustomDataset({}).ok).toBe(false);
     const six = validEdits();
     six[spamIds[5]] = 'Ännu en ny spamtext om lyxväskor';
-    const res = validateCustomDataset(six);
+    expect(validateCustomDataset(six).ok).toBe(true);
+    const four = validEdits();
+    delete four[spamIds[0]];
+    const res = validateCustomDataset(four);
     expect(res.ok).toBe(false);
-    expect(res.problems.join(' ')).toMatch(/exakt 5 texter i spamklassen/);
+    expect(res.problems.join(' ')).toMatch(/minst 5 texter i spamklassen/);
     // fortfarande exakt 20 per klass
     expect(countPerClass(applyEdits(validEdits()))).toMatchObject({ spam: 20, vanlig: 20 });
   });

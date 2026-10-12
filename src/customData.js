@@ -4,7 +4,7 @@ import { findTrainingProblems } from './dataChecks.js';
 import { normalizeText } from './ml/tokenizer.js';
 
 /**
- * "Förbättrad dataset B" = dataset B där eleven har bytt ut exakt fem texter per klass.
+ * "Förbättrad dataset B" = dataset B där eleven har bytt ut minst fem texter per klass.
  * Eleven ändrar bara texten; klassen och id:t för en plats ligger fast. Ändringarna sparas som
  * { [id]: nyText } så att det är lätt att se, jämföra och återställa vad som ändrats.
  */
@@ -46,15 +46,15 @@ export function countChanges(edits) {
 /**
  * Full kontroll av en förbättrad datamängd. Returnerar { ok, problems, rows, changes }.
  * Regler: inga tomma texter, inga dubbletter, ingen text med okänd klass, exakt 20 per klass,
- * inga texter som är identiska med validerings- eller sluttestdata och exakt fem ändringar per klass.
+ * inga texter som är identiska med validerings- eller sluttestdata och minst fem ändringar per klass.
  */
 export function validateCustomDataset(edits = {}) {
   const rows = applyEdits(edits);
   const problems = findTrainingProblems(rows).map((p) => p.message);
   const changes = countChanges(edits);
   for (const [label, name] of [[LABEL_SPAM, 'spamklassen'], [LABEL_HAM, 'klassen vanliga']]) {
-    if (changes[label] !== SWAP_COUNT) {
-      problems.push(`Byt ut exakt ${SWAP_COUNT} texter i ${name}. Just nu: ${changes[label]}.`);
+    if (changes[label] < SWAP_COUNT) {
+      problems.push(`Byt ut minst ${SWAP_COUNT} texter i ${name}. Just nu: ${changes[label]}.`);
     }
   }
   return { ok: problems.length === 0, problems, rows, changes, expectedPerClass: CLASS_SIZE };

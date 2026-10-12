@@ -72,7 +72,7 @@ describe('Lektionsguide', () => {
     expect(guideSteps(3, compare)[0].done).toBe(false);
     const epochs = { ...s, runs: await train('compare-epochs', 'b'), runsMode: 'compare-epochs' };
     expect(guideSteps(3, epochs)[0].done).toBe(true);
-    // lektion 4: data giltig först när exakt fem texter per klass bytts
+    // lektion 4: data giltig först när minst fem texter per klass bytts
     expect(guideSteps(4, s)[0].done).toBe(false);
     const B = DATASETS.b.texts;
     const edits = {};

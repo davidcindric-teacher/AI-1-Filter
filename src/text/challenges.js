@@ -39,10 +39,10 @@ export const CHALLENGES = [
     key: 'improve',
     title: 'Lektion 4: Förbättring och sluttest',
     tasks: [
-      'Innan du byter ut texter: skriv en hypotes om vilka fem spamtexter och fem vanliga texter som är mest värda att byta, och varför (titta på felklassificerade texter).',
+      'Innan du byter ut texter: skriv en hypotes om vilka spamtexter och vanliga texter som är mest värda att byta, och varför (titta på felklassificerade texter).',
       'Prova två olika förbättringsstrategier och jämför dem på valideringsdata. Välj den bästa. Kör sedan sluttestet EN gång. Använd aldrig sluttestet för att välja mellan strategierna.',
       'Kör "Före och efter över flera frön" (ovan i steget Fördjupning). Håller förbättringen i de flesta frön, eller kan den bero på slumpen?',
-      'Använd felanalysen under dina felklassificerade texter: vilka ord saknades i träningsdatan, och vilka fem texter borde du byta för att åtgärda det?',
+      'Använd felanalysen under dina felklassificerade texter: vilka ord saknades i träningsdatan, och vilka texter borde du byta för att åtgärda det?',
       'Kostnadsfrågan: vilket fel är värst för ett skolmejl, falskt positivt eller falskt negativt? Koppla till precision och recall.',
       'Förklara varför en förbättring på valideringsdata inte behöver synas på sluttestet.',
     ],

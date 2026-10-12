@@ -187,10 +187,10 @@ describe('12. Avvisning av ogiltig återställningstext', () => {
     const edits = goodEdits();
     const txt = buildRecoveryText({ attemptName: '', now: NOW, mode: 'improve', datasetKey: 'custom', settings, edits });
     const d = JSON.parse(txt);
-    // en ändring för lite → exakt fem-kravet bryts, texterna hålls konsekventa
+    // en ändring för lite → minst fem-kravet bryts, texterna hålls konsekventa
     const firstId = Object.keys(d.edits)[0];
     delete d.edits[firstId];
     d.trainingTexts = applyEdits(d.edits).map(({ id, text, label }) => ({ id, text, label }));
-    expect(errs(d).errors.join(' ')).toMatch(/exakt 5 texter/);
+    expect(errs(d).errors.join(' ')).toMatch(/minst 5 texter/);
   });
 });
