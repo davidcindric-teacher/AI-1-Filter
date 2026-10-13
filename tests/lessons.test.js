@@ -26,7 +26,7 @@ describe('Lektioner och laborationer', () => {
     expect(modeForLesson(5, 'improve')).toBe('improve'); // lektion 5 har inga träningslägen
   });
   it('dataset-kort visas per lektion', () => {
-    expect(allowedDatasets(1)).toEqual(['a', 'b']);
+    expect(allowedDatasets(1)).toEqual(['a']);
     expect(allowedDatasets(2)).toContain('mix');
     expect(allowedDatasets(2)).not.toContain('custom');
     expect(allowedDatasets(4)).toContain('custom');
@@ -82,6 +82,14 @@ describe('Lektionsguide', () => {
     expect(guideSteps(4, { ...s, finalTestRuns: 1 }).find((x) => x.id === 'l4-final').done).toBe(true);
     expect(guideSteps(5, s)).toEqual([]);
     expect(guideSteps('all', s)).toEqual([]);
+  });
+  it('lektion 2 räknar bara texter som testats på båda modellerna', () => {
+    const s = initialState();
+    const entry = (text, runLabel) => ({ text, runLabel, probability: 0.5, predicted: 'spam' });
+    const step = (testLog) => guideSteps(2, { ...s, testLog }).find((x) => x.id === 'l2-test');
+    expect(step([entry('Hej', 'A'), entry('Tja', 'A')]).done).toBe(false);
+    expect(step([entry('Hej', 'A'), entry('hej ', 'B'), entry('Tja', 'A')]).text).toContain('1 av minst 2');
+    expect(step([entry('Hej', 'A'), entry('Hej', 'B'), entry('Tja', 'B'), entry('Tja', 'A')]).done).toBe(true);
   });
   it('progress räknar klara steg', () => {
     expect(guideProgress(guideSteps(1, { ...initialState(), manualDone: { 'l1-look': true } }))).toEqual({ done: 1, total: 4 });

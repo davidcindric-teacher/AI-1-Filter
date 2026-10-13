@@ -102,13 +102,13 @@ export async function startTraining(store) {
   });
 }
 
-/** Extra: samma träning med 5 olika slumpfrön. Ersätter inte de vanliga resultaten. */
-export async function startSeedExperiment(store) {
+/** Extra: samma träning med 5 olika slumpfrön. Ersätter inte de vanliga resultaten. datasetKey: valt dataset när laborationen har flera. */
+export async function startSeedExperiment(store, datasetKey) {
   if (!canStart(store)) return;
   const state = store.get();
   let plan;
   try {
-    plan = buildSeedPlan({ datasetKey: shownDataset(state), settings: state.settings, edits: state.edits, mixIds: state.mixIds });
+    plan = buildSeedPlan({ datasetKey: datasetKey ?? shownDataset(state), settings: state.settings, edits: state.edits, mixIds: state.mixIds });
   } catch (err) {
     store.set({ error: describeError(err), notice: null });
     return;

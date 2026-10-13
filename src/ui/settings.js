@@ -52,9 +52,13 @@ export function mountSettings(root, store) {
       oninput: (e) => store.set({ settings: { ...store.get().settings, [key]: parseNumber(e.target.value) } }),
     });
     const [lo, hi] = LIMITS[key];
+    const hintText = `Tillåtet: ${String(lo).replace('.', ',')}–${String(hi).replace('.', ',')}. Förval: ${String(DEFAULTS[key]).replace('.', ',')}.`;
+    const hint = h('span', { class: 'hint', id: `${id}-hint`, text: hintText });
     return {
       input,
-      el: h('div', { class: 'field' }, h('label', { for: id }, labelNode), input, h('span', { class: 'hint', id: `${id}-hint`, text: `Tillåtet: ${String(lo).replace('.', ',')}–${String(hi).replace('.', ',')}. Förval: ${String(DEFAULTS[key]).replace('.', ',')}.` })),
+      hint,
+      hintText,
+      el: h('div', { class: 'field' }, h('label', { for: id }, labelNode), input, hint),
     };
   };
 
@@ -112,6 +116,7 @@ export function mountSettings(root, store) {
     const locks = { epochs: state.mode === 'compare-epochs', learningRate: state.mode === 'compare-lr', hiddenUnits: state.mode === 'compare-hidden' };
     for (const [key, f] of Object.entries(fields)) {
       f.input.disabled = Boolean(locks[key]);
+      f.hint.textContent = locks[key] ? 'Fast i den här laborationen.' : f.hintText;
       if (locks[key]) f.input.value = shown(key);
       else if (document.activeElement !== f.input) f.input.value = Number.isNaN(state.settings[key]) ? '' : fmt(state.settings[key]);
     }

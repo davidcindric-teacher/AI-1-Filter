@@ -1,6 +1,7 @@
 import { LABEL_NAMES } from '../config.js';
 import { testText } from '../ml/trainer.js';
 import { formatMetric } from '../metrics.js';
+import { textsOnBothModels } from '../lessons.js';
 import { h, replace, table } from './dom.js';
 
 export const runDisplayName = (run) => `${run.label} · ${run.settings.epochs} epoker · frö ${run.settings.seed}`;
@@ -74,10 +75,16 @@ export function mountTester(root, store) {
   let lastRuns = null;
   let lastLog = null;
   const render = (state) => {
-    const n = new Set(state.testLog.map((t) => t.text.trim().toLowerCase())).size;
     const goal = state.lesson === 1 || state.lesson === 'all' ? 4 : state.lesson === 2 ? 2 : 0;
     counter.hidden = goal === 0;
-    counter.textContent = goal ? `Testa minst ${goal} egna påhittade meddelanden. Du har testat ${n} av ${goal}.${n >= goal ? ' Klart!' : ''}` : '';
+    if (state.lesson === 2) {
+      // Lektion 2: samma text ska testas på både modell A och modell B för att räknas.
+      const n = textsOnBothModels(state.testLog);
+      counter.textContent = `Testa minst ${goal} egna påhittade meddelanden på båda modellerna: testa texten, byt modell i listan och testa samma text igen. Klart på båda: ${n} av ${goal}.${n >= goal ? ' Klart!' : ''}`;
+    } else {
+      const n = new Set(state.testLog.map((t) => t.text.trim().toLowerCase())).size;
+      counter.textContent = goal ? `Testa minst ${goal} egna påhittade meddelanden. Du har testat ${n} av ${goal}.${n >= goal ? ' Klart!' : ''}` : '';
+    }
     if (state.runs !== lastRuns) {
       lastRuns = state.runs;
       const prev = select.value;

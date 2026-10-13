@@ -18,9 +18,10 @@ export const LESSON_MODES = Object.freeze({
   4: ['improve'],
 });
 
-/** Vilka dataset-kort som visas i respektive lektion. A och B alltid, eget mix bara i lektion 2, förbättrad B bara i lektion 4. */
+/** Vilka dataset-kort som visas i respektive lektion. Bara A i lektion 1, eget mix bara i lektion 2, förbättrad B bara i lektion 4. */
 export function allowedDatasets(lesson) {
   if (lesson === 'all') return ['a', 'b', 'custom', 'mix'];
+  if (lesson === 1) return ['a'];
   if (lesson === 4) return ['a', 'b', 'custom'];
   if (lesson === 2) return ['a', 'b', 'mix'];
   return ['a', 'b'];
@@ -48,6 +49,17 @@ export const isVisibleIn = (lessonsAttr, lesson) => lesson === 'all' || lessonsA
 
 const uniqueTexts = (log) => new Set(log.map((t) => t.text.trim().toLowerCase())).size;
 
+/** Antal olika texter som testats på minst två olika modeller (lektion 2: samma text på modell A och B). */
+export function textsOnBothModels(log) {
+  const models = new Map();
+  for (const t of log) {
+    const key = t.text.trim().toLowerCase();
+    if (!models.has(key)) models.set(key, new Set());
+    models.get(key).add(t.runLabel);
+  }
+  return [...models.values()].filter((m) => m.size >= 2).length;
+}
+
 /**
  * Lektionsguidens steg. Automatiska steg bockas av utifrån vad eleven faktiskt gjort i appen.
  * Manuella steg (kind: 'manual') bockar eleven själv, eftersom appen inte kan veta om något skrivits i dokumentet.
@@ -56,6 +68,7 @@ export function guideSteps(lesson, s) {
   if (!LESSON_KEYS.includes(lesson)) return [];
   const trained = (modes) => s.runs.length > 0 && modes.includes(s.runsMode);
   const tests = uniqueTexts(s.testLog);
+  const both = textsOnBothModels(s.testLog);
   const copied = s.runs.length > 0 && s.copied.result && s.copied.recovery;
   const manual = (id, target, text) => ({ id, kind: 'manual', target, text, done: Boolean(s.manualDone[id]) });
   const auto = (id, target, text, done) => ({ id, kind: 'auto', target, text, done: Boolean(done) });
@@ -73,7 +86,7 @@ export function guideSteps(lesson, s) {
       return [
         auto('l2-train', '#trana', 'Träna dataset A och B med samma inställningar', trained(['compare-datasets', 'compare-abc'])),
         manual('l2-compare', '#resultat', 'Jämför A och B sida vid sida. Vad skiljer i träningsdata och i resultat?'),
-        auto('l2-test', '#testa', `Testa samma texter på båda modellerna (${Math.min(tests, 2)} av minst 2 texter)`, tests >= 2),
+        auto('l2-test', '#testa', `Testa samma texter på båda modellerna (${Math.min(both, 2)} av minst 2 texter)`, both >= 2),
         copyStep,
       ];
     case 3:

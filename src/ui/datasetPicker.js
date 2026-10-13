@@ -111,9 +111,11 @@ export function mountDatasetPicker(root, store) {
     };
     replace(cards, allowed.map((key) => all[key]()));
     syncSelection(usedDatasets(state));
-    const locked = state.mode !== 'single';
+    const locked = state.mode !== 'single' || state.lesson === 1;
     fieldset.disabled = locked;
-    note.textContent = locked
+    note.textContent = state.lesson === 1
+      ? 'I Lektion 1 används dataset A.'
+      : locked
       ? {
           'compare-datasets': 'I Lektion 2 tränas dataset A och dataset B, båda med samma inställningar.',
           'compare-epochs': 'I Lektion 3 används dataset B.',

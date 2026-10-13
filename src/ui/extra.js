@@ -1,6 +1,6 @@
 import { formatMetric } from '../metrics.js';
 import { metricsAtThreshold, summarizeSpread, sweepThresholds } from '../thresholdAnalysis.js';
-import { datasetPhrase, SEED_COUNT, shownDataset } from '../experiments.js';
+import { datasetPhrase, SEED_COUNT, shownDataset, usedDatasets } from '../experiments.js';
 import { THRESHOLD } from '../config.js';
 import { CHALLENGES } from '../text/challenges.js';
 import { h, replace, table } from './dom.js';
@@ -16,21 +16,31 @@ const pct = formatMetric;
 /** Extra 1: samma träning med flera slumpfrön. */
 function mountSeed(root, store) {
   const info = h('p', { class: 'muted' });
-  const btn = h('button', { type: 'button', class: 'btn btn-primary', text: `Kör med ${SEED_COUNT} olika frön`, onclick: () => startSeedExperiment(store) });
+  // Tränar laborationen flera dataset (lektion 2: A och B) väljer eleven själv vilket som körs med flera frön.
+  const pick = h('select', { id: 'seed-dataset' });
+  const pickField = h('div', { class: 'field field-narrow' }, h('label', { for: 'seed-dataset', text: 'Dataset att köra med flera frön' }), pick);
+  const btn = h('button', { type: 'button', class: 'btn btn-primary', text: `Kör med ${SEED_COUNT} olika frön`, onclick: () => startSeedExperiment(store, pickField.hidden ? undefined : pick.value) });
   const out = h('div');
   root.append(
     h('h3', { text: 'Frö-experiment' }),
     h('p', {}, 'Ett resultat beror delvis på slumpen (startvikter och ordning på träningstexterna). Här tränas samma modell med samma data och inställningar men med ', String(SEED_COUNT), ' olika slumpfrön i följd. Då ser du hur mycket resultatet varierar bara på grund av slumpen.'),
+    pickField,
     info,
     h('div', { class: 'button-row' }, btn),
     out,
   );
   let lastRuns = null;
+  let lastKeys = '';
   const render = (state) => {
-    // I låsta laborationer (lektion 2 och 4) körs experimentet på laborationens dataset, inte på ett dolt tidigare val.
-    const ds = datasetPhrase(shownDataset(state));
+    const keys = usedDatasets(state);
+    if (keys.join(',') !== lastKeys) {
+      lastKeys = keys.join(',');
+      replace(pick, keys.map((k) => h('option', { value: k, text: datasetPhrase(k) })));
+    }
+    pickField.hidden = keys.length < 2;
     const s = state.settings;
-    info.textContent = `Använder ${ds} (steget Välj dataset), ${s.epochs} epoker och frö ${s.seed}, ${s.seed + 1}, … (steget Välj inställningar).`;
+    const ds = keys.length < 2 ? `${datasetPhrase(shownDataset(state))}, ` : '';
+    info.textContent = `Använder ${ds}${s.epochs} epoker och frö ${s.seed}, ${s.seed + 1}, … (steget Välj inställningar).`;
     btn.disabled = Boolean(state.training);
     const exp = state.seedExperiment;
     if (exp === lastRuns) return;
@@ -163,7 +173,7 @@ export function mountExtra(root, store) {
     el.dataset.lessons = lessons;
     return el;
   };
-  const seed = part('1 2 4');
+  const seed = part('1 2');
   const thr = part('1 4');
   const words = part('2');
   const mix = part('2');
@@ -171,7 +181,7 @@ export function mountExtra(root, store) {
   const improve = part('4');
   const ch = part('1 2 3 4');
   root.append(
-    h('p', {}, 'Fördjupning för dig som blir klar tidigt. Ingenting här ändrar dina vanliga resultat i steget Resultat. Frö- och tröskelexperiment tas med i resultatblocket.'),
+    h('p', {}, 'Fördjupning för dig som blir klar tidigt. Ingenting här ändrar dina vanliga resultat i steget Resultat.'),
     seed,
     thr,
     words,

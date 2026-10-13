@@ -212,8 +212,8 @@ function comparison(runs, mode) {
   const showLr = mode === 'compare-lr';
   const showHidden = mode === 'compare-hidden';
   const mainRows = [
-    // Raden behövs bara när kolumnrubrikerna inte redan är datasetens namn (t.ex. i lektion 3).
-    runs.every((r) => r.label === r.datasetName) ? null : row('Dataset', (r) => r.datasetName),
+    // Raden behövs bara när körningarna har olika dataset och kolumnrubrikerna inte redan är datasetens namn.
+    runs.every((r) => r.label === r.datasetName) || new Set(runs.map((r) => r.datasetName)).size === 1 ? null : row('Dataset', (r) => r.datasetName),
     row('Antal epoker', (r) => String(r.settings.epochs)),
     row('Slumpfrö', (r) => String(r.settings.seed)),
     showVocab ? row('Ord i vokabulären', (r) => String(r.vocabSize)) : null,
